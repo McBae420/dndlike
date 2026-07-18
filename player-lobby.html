@@ -6,7 +6,7 @@
     <title>Join Lobby - DnD Roguelike</title>
     <link rel="stylesheet" href="lobby.css?v=1" />
   </head>
-  <body data-vtt-view="player" data-lobby-view="player">
+  <body data-vtt-view="player" data-lobby-view="player" data-multiplayer-scope="characters">
     <main class="lobby-app">
       <header class="lobby-header dungeon-header">
         <div>
@@ -17,6 +17,16 @@
           <a href="index.html">Change role</a>
         </nav>
       </header>
+
+      <section class="multiplayer-bar" data-multiplayer-mount aria-label="Multiplayer connection">
+        <div class="multiplayer-summary">
+          <span class="connection-dot"></span>
+          <div>
+            <strong>Loading lobby controls…</strong>
+            <small>The page is ready while the secure connection starts.</small>
+          </div>
+        </div>
+      </section>
 
       <section class="lobby-steps" aria-label="Player setup">
         <article>
@@ -49,9 +59,7 @@
       </section>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js?v=1"></script>
-    <script src="multiplayer.js?v=6"></script>
-    <script src="lobby.js?v=1"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="lobby-app.bundle.js?v=1"></script>
   </body>
 </html>
