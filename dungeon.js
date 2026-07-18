@@ -1713,15 +1713,28 @@ function pointKey(point) {
 }
 
 function characterDarkvisionFeet(character) {
-  const darkvisionFeatures = [
-    ...featureList(character?.race?.features),
-    ...featureList(character?.subrace?.features),
-  ].filter((feature) => /darkvision/i.test(feature));
-  const ranges = darkvisionFeatures.flatMap((feature) =>
-    [...feature.matchAll(/darkvision\D*?(\d+)\s*(?:ft\.?|feet)/gi)]
+  const visionValues = [
+    character?.vision,
+    character?.darkvision,
+    character?.stats?.vision,
+    character?.stats?.darkvision,
+    character?.race?.vision,
+    character?.race?.darkvision,
+    character?.subrace?.vision,
+    character?.subrace?.darkvision,
+    labeledFeatureValue(character?.race?.features, "Darkvision"),
+    labeledFeatureValue(character?.subrace?.features, "Darkvision"),
+    ...featureList(character?.race?.features).filter((feature) => /darkvision/i.test(feature)),
+    ...featureList(character?.subrace?.features).filter((feature) => /darkvision/i.test(feature)),
+  ];
+  const ranges = visionValues.flatMap((value) => {
+    if (Number.isFinite(Number(value)) && Number(value) > 0) return [Number(value)];
+    const text = textValue(value);
+    if (!text || /^none$/i.test(text.trim())) return [];
+    return [...text.matchAll(/(\d+)\s*(?:ft\.?|feet)?/gi)]
       .map((match) => Number(match[1]))
-      .filter((range) => Number.isFinite(range) && range > 0),
-  );
+      .filter((range) => Number.isFinite(range) && range > 0);
+  });
   return ranges.length ? Math.max(...ranges) : 0;
 }
 
@@ -1783,24 +1796,12 @@ function computePlayerSightTiles({
         if (distance(player, neighbor) > sightRange) continue;
         const tile = dungeon.grid[neighbor.y]?.[neighbor.x];
         if (!tile || tile.type === "void") continue;
-        if (!hasLineOfSight(player, neighbor)) continue;
         visible.add(key);
         if (isSightTraversableTile(tile)) queue.push(neighbor);
       }
     }
   }
   return visible;
-}
-
-function hasLineOfSight(from, to) {
-  const line = gridLine(from, to);
-  for (let index = 1; index < line.length; index += 1) {
-    const point = line[index];
-    const tile = dungeon.grid[point.y]?.[point.x];
-    if (!tile) return false;
-    if (isSightBlockingTile(tile)) return point.x === to.x && point.y === to.y;
-  }
-  return true;
 }
 
 function rememberSeenTiles() {
@@ -2117,7 +2118,7 @@ async function submitOrAnimateMovement(token, path) {
       tokenId: token.id,
       path: path.map((point) => ({ x: point.x, y: point.y })),
     }).catch(() => null);
-    await animateTokenAlongPath(token, path, 45);
+    await animateTokenAlongPath(token, path);
     return Boolean(await actionRequest);
   }
   await animateTokenAlongPath(token, path);
@@ -3344,6 +3345,7 @@ function publicDungeonState(member) {
     }
 
     const nextTile = { ...tile };
+    nextTile.visibility = "revealed";
     if (nextTile.type === "secret door") {
       nextTile.type = "wall";
       delete nextTile.doorId;
