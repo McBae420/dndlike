@@ -173,7 +173,6 @@ let multiplayerSyncTimer = null;
 let multiplayerSyncInFlight = false;
 let multiplayerSyncQueued = false;
 let applyingMultiplayerState = false;
-let movementMessageTimer = null;
 
 const stageSelect = document.querySelector("#dungeon-stage");
 const viewModeSelect = document.querySelector("#view-mode");
@@ -1491,7 +1490,7 @@ function renderTokenInTile(tileElement, token) {
   } else {
     dot.textContent = token.type === "player" ? "P" : "M";
   }
-  dot.addEventListener("pointerdown", (event) => startTokenDrag(event, token));
+  dot.addEventListener("mousedown", (event) => startTokenDrag(event, token));
   tileElement.append(dot);
 }
 
@@ -1739,7 +1738,6 @@ function effectivePlayerVisionFeet(
   playerState = null,
 ) {
   return Math.max(
-    30,
     characterDarkvisionFeet(character),
     activeVisionEffect(playerState)?.feet || 0,
   );
@@ -1854,48 +1852,19 @@ function isSightTraversableTile(tile) {
   return tile.type !== "void" && !isSightBlockingTile(tile);
 }
 
-async function handleTileClick(x, y) {
+function handleTileClick(x, y) {
   if (panState?.moved) return;
   if (tokenDragState?.moved) return;
   if (toggleDoorIfAllowed(x, y)) return;
-  const activeToken = activePlayerToken();
-  const activeTokenWasArmed = vttMode === "player"
-    && activeToken
-    && selectedTokenId === activeToken.id
-    && selectedTile?.x === activeToken.x
-    && selectedTile?.y === activeToken.y;
+  setSelectedTile({ x, y });
   const clickedToken = dungeon.tokens.find((token) => token.x === x && token.y === y && tokenVisible(token) && token.currentHp > 0);
   if (clickedToken) {
     selectedTokenId = clickedToken.id;
-    setSelectedTile({ x, y });
     refreshTokenTiles({ x: clickedToken.x, y: clickedToken.y });
     renderInspector();
     return;
   }
 
-  if (activeTokenWasArmed) {
-    const path = findMovementPath(activeToken, x, y);
-    if (path.length > 1) {
-      setSelectedTile({ x, y });
-      await submitOrAnimateMovement(activeToken, path);
-      renderInspector();
-      return;
-    }
-    const unrestrictedPath = findPath(
-      { x: activeToken.x, y: activeToken.y },
-      { x, y },
-      activeToken.id,
-    );
-    if (unrestrictedPath.length > playerMovementAllowance(activeToken) + 1) {
-      showMovementMessage(
-        `Too far — maximum ${playerMovementAllowance(activeToken) * 5} ft (${playerMovementAllowance(activeToken)} hexes)`,
-        true,
-      );
-      return;
-    }
-  }
-
-  setSelectedTile({ x, y });
   renderInspector();
 }
 
@@ -1989,7 +1958,6 @@ function startTokenDrag(event, token) {
   if (tokenMovementAnimating) return;
   event.preventDefault();
   event.stopPropagation();
-  event.currentTarget?.setPointerCapture?.(event.pointerId);
   selectedTokenId = token.id;
   selectedTile = { x: token.x, y: token.y };
   tokenDragState = {
@@ -2147,10 +2115,6 @@ async function submitOrAnimateMovement(token, path) {
       tokenId: token.id,
       path: path.map((point) => ({ x: point.x, y: point.y })),
     });
-    showMovementMessage(
-      actionId ? "Move sent to the DM…" : "Could not send movement.",
-      !actionId,
-    );
     return Boolean(actionId);
   }
   await animateTokenAlongPath(token, path);
@@ -2259,15 +2223,6 @@ function updatePathDistance(text, blocked) {
   pathDistanceElement.textContent = text;
   pathDistanceElement.classList.toggle("is-hidden", !text);
   pathDistanceElement.classList.toggle("is-blocked", blocked);
-}
-
-function showMovementMessage(text, blocked = false) {
-  if (movementMessageTimer) window.clearTimeout(movementMessageTimer);
-  updatePathDistance(text, blocked);
-  movementMessageTimer = window.setTimeout(() => {
-    movementMessageTimer = null;
-    if (!tokenDragState) updatePathDistance("", false);
-  }, blocked ? 4200 : 2200);
 }
 
 function startRightClickPan(event) {
@@ -2586,7 +2541,7 @@ function unclaimedDungeonRewards() {
     ? null
     : dungeon.grid
         .flat()
-        .find((tile) => tile?.type === "exit tile");
+        .find((tile) => tile?.type === "exit tile") || {};
   const exitRewards = exitReward
     ? [{
         id: "exit-reward",
@@ -2907,7 +2862,7 @@ function removeOneInventoryItem(entryKey) {
 }
 
 function isTorchInventoryEntry(entry) {
-  return /^torches?$/i.test(textValue(entry?.name).trim());
+  return /^torch(?:es)?$/i.test(textValue(entry?.name).trim());
 }
 
 function lightTorch(entryKey) {
@@ -3017,8 +2972,6 @@ function renderPlayerSidebar() {
       refreshTileElement(token.x, token.y);
     }
   }
-  savePlayerVttState(state);
-
   sidebarElement.innerHTML = `
     ${dungeonRewards.length === 0 ? "" : `<section class="player-sheet-panel player-rewards-panel">
       <div class="panel-heading compact">
@@ -3215,10 +3168,10 @@ function renderPlayerSidebar() {
       } else {
         nextCollapsedPanels.add(panelId);
       }
-      savePlayerVttState({
+      localStorage.setItem(playerVttStateKey, JSON.stringify({
         ...nextState,
         collapsedPanels: [...nextCollapsedPanels],
-      });
+      }));
       renderPlayerSidebar();
     };
     heading.addEventListener("click", togglePanel);
@@ -3231,7 +3184,15 @@ function renderPlayerSidebar() {
   document.querySelectorAll("[data-inventory-remove]").forEach((button) => {
     button.addEventListener("click", () => {
       const entry = playerInventoryEntries()[Number(button.dataset.inventoryRemove)];
-      if (entry) removeOneInventoryItem(entry.key);
+      if (entry && removeOneInventoryItem(entry.key)) {
+        const multiplayerState = window.avtizmMultiplayer?.getState();
+        if (vttMode === "player" && multiplayerState?.connected) {
+          window.avtizmMultiplayer.syncCharacter(
+            savedPlayerCharacter(),
+            loadPlayerVttState(savedPlayerCharacter()),
+          );
+        }
+      }
       renderPlayerSidebar();
     });
   });
@@ -3657,24 +3618,18 @@ window.addEventListener("avtizm-multiplayer:members-changed", () => {
     render();
     return;
   }
-  if (vttMode === "dm" && syncPartyTokensFromMembers()) {
-    saveDungeonState();
-    render();
+  if (vttMode === "dm") {
+    if (syncPartyTokensFromMembers()) {
+      saveDungeonState();
+      render();
+    } else {
+      scheduleMultiplayerDungeonSync();
+    }
   }
 });
 window.addEventListener("avtizm-multiplayer:game-action", (event) => {
   handleMultiplayerGameAction(event.detail.action);
 });
-window.addEventListener("avtizm-multiplayer:action-result", (event) => {
-  const action = event.detail.action;
-  if (vttMode !== "player" || action?.action_type !== "move-token") return;
-  if (action.status === "rejected") {
-    showMovementMessage(action.result?.reason || "The DM rejected that movement.", true);
-  } else if (action.status === "accepted") {
-    showMovementMessage("Movement accepted.", false);
-  }
-});
-
 applyPageMode();
 if (vttMode === "player") {
   renderPlayerSidebarSafely();
@@ -3687,10 +3642,9 @@ viewModeSelect?.addEventListener("change", render);
 gridElement.addEventListener("contextmenu", (event) => event.preventDefault());
 gridElement.addEventListener("mousedown", startRightClickPan);
 window.addEventListener("mousemove", moveRightClickPan);
-window.addEventListener("pointermove", updateTokenDragPreviewFromEvent);
+window.addEventListener("mousemove", updateTokenDragPreviewFromEvent);
 window.addEventListener("mouseup", endRightClickPan);
-window.addEventListener("pointerup", finishTokenDrag);
-window.addEventListener("pointercancel", cancelTokenDrag);
+window.addEventListener("mouseup", finishTokenDrag);
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape") cancelTokenDrag();
 });
@@ -3704,7 +3658,7 @@ window.addEventListener("storage", (event) => {
     return;
   }
   if ([savedCharacterKey, rewardHistoryKey, playerVttStateKey].includes(event.key)) {
-    renderPlayerSidebarSafely();
+    if (vttMode === "player") renderPlayerSidebarSafely();
     render();
   }
 });

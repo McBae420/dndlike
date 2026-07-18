@@ -433,19 +433,6 @@
             });
           }
         },
-      ).on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "player_actions",
-          filter: `user_id=eq.${state.userId}`,
-        },
-        (payload) => {
-          if (payload.new?.campaign_id === state.campaignId) {
-            emit("action-result", { action: payload.new });
-          }
-        },
       );
     }
 
