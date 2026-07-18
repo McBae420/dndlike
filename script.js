@@ -208,7 +208,34 @@ let spellMap = {
   cantrips: [],
   level1: [],
 };
-let originFeats = [];
+const fallbackOriginFeats = [
+  {
+    name: "Alert",
+    features: ["Add your Proficiency Bonus to Initiative rolls."],
+  },
+  {
+    name: "Healer",
+    features: ["Use a Healer's Kit to help an ally recover Hit Points."],
+  },
+  {
+    name: "Lucky",
+    features: ["Gain Luck Points that can grant Advantage or impose Disadvantage."],
+  },
+  {
+    name: "Savage Attacker",
+    features: ["Once per turn, roll weapon damage twice and use either roll."],
+  },
+  {
+    name: "Tavern Brawler",
+    features: ["Improve Unarmed Strikes and gain proficiency with improvised weapons."],
+  },
+  {
+    name: "Tough",
+    features: ["Increase your Hit Point maximum as you gain levels."],
+  },
+];
+let originFeats = fallbackOriginFeats;
+const bundledBuilderData = window.AVTIZM_BUILDER_DATA || null;
 
 function activePlayerCampaignId() {
   try {
@@ -1171,14 +1198,16 @@ function renderSummary() {
     featureText(state.class.features);
 }
 
+async function loadBuilderJson(key, url) {
+  if (bundledBuilderData?.[key]) return bundledBuilderData[key];
+  const response = await fetch(url, { cache: "force-cache" });
+  if (!response.ok) throw new Error(`Could not load ${url}: ${response.status}`);
+  return response.json();
+}
+
 async function loadRaceFeatures() {
   try {
-    const response = await fetch("Races/features.json", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Could not load race features: ${response.status}`);
-    }
-
-    const featureMap = await response.json();
+    const featureMap = await loadBuilderJson("raceFeatures", "Races/features.json");
     races.forEach((race) => {
       race.features = featureMap[race.name] || race.features;
     });
@@ -1189,12 +1218,7 @@ async function loadRaceFeatures() {
 
 async function loadSubraceFeatures() {
   try {
-    const response = await fetch("Races/subraces.json", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Could not load subrace options: ${response.status}`);
-    }
-
-    subraceMap = await response.json();
+    subraceMap = await loadBuilderJson("subraces", "Races/subraces.json");
   } catch (error) {
     console.warn(error);
     subraceMap = {};
@@ -1203,12 +1227,7 @@ async function loadSubraceFeatures() {
 
 async function loadClassFeatures() {
   try {
-    const response = await fetch("Classes/features.json", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Could not load class features: ${response.status}`);
-    }
-
-    const featureMap = await response.json();
+    const featureMap = await loadBuilderJson("classFeatures", "Classes/features.json");
     classes.forEach((characterClass) => {
       const classFeatures =
         featureMap[characterClass.name] ||
@@ -1236,12 +1255,7 @@ async function loadClassFeatures() {
 
 async function loadClassOptions() {
   try {
-    const response = await fetch("Classes/options.json", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Could not load class options: ${response.status}`);
-    }
-
-    classOptionMap = await response.json();
+    classOptionMap = await loadBuilderJson("classOptions", "Classes/options.json");
   } catch (error) {
     console.warn(error);
     classOptionMap = {};
@@ -1250,12 +1264,7 @@ async function loadClassOptions() {
 
 async function loadSpells() {
   try {
-    const response = await fetch("Spells/spells.json", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Could not load spells: ${response.status}`);
-    }
-
-    spellMap = await response.json();
+    spellMap = await loadBuilderJson("spells", "Spells/spells.json");
   } catch (error) {
     console.warn(error);
     spellMap = {
@@ -1267,19 +1276,14 @@ async function loadSpells() {
 
 async function loadOriginFeats() {
   try {
-    const response = await fetch("Feats/origin-feats.json", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Could not load origin feats: ${response.status}`);
-    }
-
-    const featMap = await response.json();
+    const featMap = await loadBuilderJson("originFeats", "Feats/origin-feats.json");
     originFeats = Object.entries(featMap).map(([name, features]) => ({
       name,
       features,
     }));
   } catch (error) {
     console.warn(error);
-    originFeats = [];
+    originFeats = fallbackOriginFeats;
   }
 }
 
