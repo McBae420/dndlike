@@ -4,6 +4,7 @@
   const mode = document.body.dataset.vttView === "player" ? "player" : "dm";
   const sessionStorageKey = `avtizm4.multiplayer.${mode}`;
   const characterStorageKey = "avtizm4.character";
+  const rewardStorageKey = "avtizm4.rewards";
   const playerStateStorageKey = "avtizm4.vtt.player";
 
   const state = {
@@ -19,6 +20,7 @@
     tokenId: null,
     displayName: "",
     members: [],
+    onlineUserIds: [],
     tokenPositions: [],
     client: null,
     channel: null,
@@ -93,7 +95,7 @@
     barElement = document.createElement("section");
     barElement.className = "multiplayer-bar";
     barElement.setAttribute("aria-label", "Multiplayer connection");
-    const header = document.querySelector(".dungeon-header");
+    const header = document.querySelector(".dungeon-header, .future-header, .lobby-header");
     header?.insertAdjacentElement("afterend", barElement);
     renderBar();
   }
@@ -376,8 +378,20 @@
     }
     if (row.player_state && Object.keys(row.player_state).length > 0) {
       const localState = loadJson(playerStateStorageKey, {});
-      if (Object.keys(localState).length === 0) {
-        localStorage.setItem(playerStateStorageKey, JSON.stringify(row.player_state));
+      localStorage.setItem(playerStateStorageKey, JSON.stringify({
+        ...localState,
+        ...row.player_state,
+      }));
+      if (Array.isArray(row.player_state.rewards)) {
+        const localRewards = loadJson(rewardStorageKey, []);
+        const localRewardTime = Math.max(
+          0,
+          ...localRewards.map((reward) => Date.parse(reward?.savedAt || 0) || 0),
+        );
+        const remoteTime = Date.parse(row.updated_at || 0) || 0;
+        if (localRewards.length === 0 || remoteTime >= localRewardTime) {
+          localStorage.setItem(rewardStorageKey, JSON.stringify(row.player_state.rewards));
+        }
       }
     }
   }
@@ -412,7 +426,24 @@
   async function subscribeToCampaign() {
     if (state.channel) await state.client.removeChannel(state.channel);
     state.channel = state.client
-      .channel(`campaign:${state.campaignId}:${mode}:${state.userId}`)
+      .channel(`campaign:${state.campaignId}`, {
+        config: {
+          presence: {
+            key: state.userId,
+          },
+        },
+      })
+      .on("presence", { event: "sync" }, () => {
+        const presenceState = state.channel?.presenceState?.() || {};
+        state.onlineUserIds = [...new Set(
+          Object.values(presenceState)
+            .flat()
+            .map((presence) => presence.user_id)
+            .filter(Boolean),
+        )];
+        renderBar();
+        emit("presence-changed", { onlineUserIds: state.onlineUserIds });
+      })
       .on(
         "postgres_changes",
         {
@@ -486,7 +517,14 @@
       );
     }
 
-    state.channel.subscribe((status) => {
+    state.channel.subscribe(async (status) => {
+      if (status === "SUBSCRIBED") {
+        await state.channel.track({
+          user_id: state.userId,
+          role: mode,
+          online_at: new Date().toISOString(),
+        });
+      }
       if (status === "CHANNEL_ERROR") {
         state.error = "Realtime connection interrupted. Reconnecting…";
         renderBar();
@@ -555,6 +593,7 @@
     state.joinCode = "";
     state.tokenId = null;
     state.members = [];
+    state.onlineUserIds = [];
     state.tokenPositions = [];
     state.error = "";
     persistSession();
@@ -564,16 +603,45 @@
 
   async function syncCharacter(character, playerState) {
     if (!state.connected || mode !== "player") return;
-    const { error } = await state.client
-      .from("player_characters")
-      .upsert({
-        campaign_id: state.campaignId,
-        user_id: state.userId,
-        character: character || {},
-        player_state: playerState || {},
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "campaign_id,user_id" });
-    if (error) reportError("Could not sync player character", error);
+    const { error } = await state.client.rpc("sync_player_character_sheet", {
+      p_campaign_id: state.campaignId,
+      p_character: character || {},
+      p_sheet_state: playerState || {},
+    });
+    if (error) {
+      reportError("Could not sync player character", error);
+      return false;
+    }
+    return true;
+  }
+
+  async function grantReward(userId, rewardType) {
+    if (!state.connected || mode !== "dm" || !userId || !rewardType) return null;
+    const { data, error } = await state.client.rpc("queue_campaign_reward", {
+      p_campaign_id: state.campaignId,
+      p_user_id: userId,
+      p_reward_type: rewardType,
+    });
+    if (error) {
+      reportError("Could not send reward", error);
+      return null;
+    }
+    await refreshMembers();
+    return data;
+  }
+
+  async function consumeRewardGrant(grantId) {
+    if (!state.connected || mode !== "player" || !grantId) return false;
+    const { error } = await state.client.rpc("consume_campaign_reward", {
+      p_campaign_id: state.campaignId,
+      p_grant_id: grantId,
+    });
+    if (error) {
+      reportError("Could not claim reward", error);
+      return false;
+    }
+    await refreshMembers();
+    return true;
   }
 
   async function saveDmState(dungeonState) {
@@ -692,6 +760,7 @@
       tokenId: state.tokenId,
       displayName: state.displayName,
       members: state.members,
+      onlineUserIds: state.onlineUserIds,
       tokenPositions: state.tokenPositions,
     };
   }
@@ -703,6 +772,8 @@
     refreshDungeonState,
     refreshTokenPositions,
     syncCharacter,
+    grantReward,
+    consumeRewardGrant,
     saveDmState,
     savePlayerViews,
     syncTokenPositions,

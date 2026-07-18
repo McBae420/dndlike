@@ -13,12 +13,30 @@ The database schema is stored in:
 
 - `supabase/migrations/20260718110000_multiplayer.sql`
 - `supabase/migrations/20260718133000_direct_token_sync.sql`
+- `supabase/migrations/20260718163000_character_lobby_rewards.sql`
 
 Anonymous sign-ins must be enabled in the Supabase dashboard under
 Authentication settings. Before making the site broadly public, enable CAPTCHA
 protection for anonymous sign-ins.
 
 ## How a game works
+
+1. Open `index.html` and choose Player or Dungeon Master.
+2. The DM opens `dm-lobby.html`, creates a lobby, and shares the six-character
+   game code.
+3. A player opens `player-lobby.html`, enters the code and a display name, then
+   creates or confirms a character.
+4. Finishing character creation opens `future.html`, the synchronized character
+   sheet and reward inbox.
+5. The DM roster updates in realtime with every player's race, class, level, HP,
+   abilities, reward count, and online status.
+6. The DM can send a reward to one player. Only that player can open and claim
+   it, after which the claimed reward is synchronized back to the DM.
+
+The older dungeon-map flow remains in the repository, but it is no longer the
+main entry path.
+
+## Legacy VTT flow
 
 1. The DM opens `dungeon-dm.html` and creates a game.
 2. The DM shares the six-character game code.
@@ -57,6 +75,9 @@ node tools/dev-server.mjs 4173
 
 Then open:
 
+- `http://127.0.0.1:4173/index.html`
+- `http://127.0.0.1:4173/dm-lobby.html`
+- `http://127.0.0.1:4173/player-lobby.html`
 - `http://127.0.0.1:4173/dungeon-dm.html`
 - `http://127.0.0.1:4173/dungeon-player.html`
 

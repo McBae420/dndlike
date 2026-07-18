@@ -3,40 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Adventure - DnD Roguelike</title>
+    <title>Character Sheet - DnD Roguelike</title>
+    <link rel="stylesheet" href="lobby.css?v=1" />
     <link rel="stylesheet" href="styles.css?v=6" />
-    <link rel="stylesheet" href="future.css?v=3" />
+    <link rel="stylesheet" href="future.css?v=4" />
   </head>
-  <body>
+  <body data-vtt-view="player">
     <main class="future-app">
       <header class="future-header">
         <div>
-          <p class="eyebrow">Adventure</p>
-          <h1>Coming Soon</h1>
+          <p class="eyebrow">Player</p>
+          <h1>Character Sheet</h1>
         </div>
         <nav class="nav-actions" aria-label="Page links">
-          <a href="dungeon-dm.html">DM VTT</a>
-          <a href="dungeon-player.html">Player VTT</a>
-          <a href="rewards.html">Rewards</a>
-          <a href="index.html">Character Builder</a>
+          <a href="player-lobby.html">Lobby</a>
+          <a href="character-builder.html">Rebuild Character</a>
         </nav>
       </header>
 
       <section class="reward-roller" aria-labelledby="floor-reward-title">
         <div class="roller-header">
           <div>
-            <p class="eyebrow">Floor 1</p>
-            <h2 id="floor-reward-title">Level-Up Reward</h2>
-          </div>
-          <div class="reward-actions" aria-label="Reward actions">
-            <button class="reward-action" type="button" data-reward-action="elite">Elite Reward</button>
-            <button class="reward-action" type="button" data-reward-action="boss">Boss Reward</button>
-            <button class="reward-action" type="button" data-reward-action="final-boss">Final Boss Reward</button>
-            <button class="reward-action" type="button" data-reward-action="common">Common Reward</button>
-            <button class="reward-action" type="button" data-reward-action="feat">Feat</button>
+            <p class="eyebrow">Rewards from your DM</p>
+            <h2 id="floor-reward-title">Reward Inbox</h2>
           </div>
         </div>
-        <p id="reward-context" class="reward-context">Choose a reward type, then pick 1 of 3 options.</p>
+        <p id="reward-context" class="reward-context">Join a lobby to receive rewards from your DM.</p>
+        <div id="dm-reward-grants" class="dm-reward-grants" aria-live="polite"></div>
       </section>
 
       <section class="saved-grid">
@@ -67,6 +60,9 @@
       <button id="confirm-level-up" class="confirm-button" type="button" disabled>Confirm</button>
     </section>
 
-    <script src="future.js?v=1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=1"></script>
+    <script src="multiplayer.js?v=6"></script>
+    <script src="future.js?v=2"></script>
   </body>
 </html>

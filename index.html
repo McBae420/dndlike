@@ -3,75 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Avtizm 4 - DnD Roguelike</title>
-    <link rel="stylesheet" href="styles.css?v=6" />
+    <title>Party Lobby - DnD Roguelike</title>
+    <link rel="stylesheet" href="lobby.css?v=1" />
   </head>
-  <body>
-    <main class="app-shell">
-      <section class="choice-screen" id="race-stage">
-        <h1>Choose your Race</h1>
-        <div class="card-grid race-grid" id="race-options" aria-live="polite"></div>
-        <button class="confirm-button" type="button" id="confirm-race" disabled>Confirm</button>
+  <body class="landing-page">
+    <main class="landing-shell">
+      <section class="landing-copy">
+        <p class="eyebrow">D&amp;D Roguelike</p>
+        <h1>Gather the party.</h1>
+        <p>
+          Join the DM’s lobby, build your character, and keep your full sheet and
+          rewards synchronized throughout the game.
+        </p>
       </section>
 
-      <section class="choice-screen is-hidden" id="subrace-stage">
-        <h1 id="subrace-title">Choose your Lineage</h1>
-        <div class="card-grid subrace-grid" id="subrace-options" aria-live="polite"></div>
-        <button class="confirm-button" type="button" id="confirm-subrace" disabled>Confirm</button>
-      </section>
-
-      <section class="choice-screen is-hidden" id="class-stage">
-        <h1>Choose your Class</h1>
-        <div class="card-grid class-grid" id="class-options" aria-live="polite"></div>
-        <button class="confirm-button" type="button" id="confirm-class" disabled>Confirm</button>
-      </section>
-
-      <section class="choice-screen is-hidden" id="class-option-stage">
-        <h1 id="class-option-title">Choose your Path</h1>
-        <div class="card-grid subrace-grid" id="class-option-options" aria-live="polite"></div>
-        <button class="confirm-button" type="button" id="confirm-class-option" disabled>Confirm</button>
-      </section>
-
-      <section class="choice-screen is-hidden" id="spell-stage">
-        <h1 id="spell-title">Choose your Spell</h1>
-        <div class="card-grid spell-grid" id="spell-options" aria-live="polite"></div>
-        <button class="confirm-button" type="button" id="confirm-spell" disabled>Confirm</button>
-      </section>
-
-      <section class="choice-screen is-hidden" id="origin-feat-stage">
-        <h1>Choose your Origin Feat</h1>
-        <div class="card-grid subrace-grid" id="origin-feat-options" aria-live="polite"></div>
-        <button class="confirm-button" type="button" id="confirm-origin-feat" disabled>Confirm</button>
-      </section>
-
-      <section class="choice-screen is-hidden" id="human-feat-stage">
-        <h1>Choose your Human Feat</h1>
-        <div class="card-grid subrace-grid" id="human-feat-options" aria-live="polite"></div>
-        <button class="confirm-button" type="button" id="confirm-human-feat" disabled>Confirm</button>
-      </section>
-
-      <section class="choice-screen is-hidden" id="summary-stage">
-        <h1 id="summary-title">Ready for the Dungeon</h1>
-        <div class="summary-card" aria-label="Chosen character">
-          <div class="summary-race">
-            <strong id="summary-race-name"></strong>
-            <img id="summary-race-image" alt="" />
-            <p id="summary-race-description"></p>
+      <section class="role-grid" aria-label="Choose how to enter">
+        <a class="role-card player-card" href="player-lobby.html">
+          <span class="role-number">01</span>
+          <div>
+            <p class="eyebrow">Player</p>
+            <h2>Join a Lobby</h2>
+            <p>Enter a game code, create your hero, and open your character sheet.</p>
           </div>
-          <div class="summary-class">
-            <strong id="summary-class-name"></strong>
-            <img id="summary-class-icon" alt="" />
-            <p id="summary-class-description"></p>
+          <span class="role-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="role-card dm-card" href="dm-lobby.html">
+          <span class="role-number">02</span>
+          <div>
+            <p class="eyebrow">Dungeon Master</p>
+            <h2>Create a Lobby</h2>
+            <p>Invite players, inspect every character, and send rewards.</p>
           </div>
-        </div>
-        <p id="summary-text"></p>
-        <div class="summary-actions">
-          <button class="confirm-button" type="button" id="reroll-button">Start over</button>
-          <button class="confirm-button secondary" type="button" id="continue-button">Continue</button>
-        </div>
+          <span class="role-arrow" aria-hidden="true">→</span>
+        </a>
       </section>
     </main>
-
-    <script src="script.js?v=1"></script>
   </body>
 </html>

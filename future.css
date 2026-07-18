@@ -149,6 +149,48 @@ p {
   font-weight: 800;
 }
 
+.dm-reward-grants {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.dm-reward-grant {
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid rgba(241, 207, 123, 0.35);
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.dm-reward-grant strong,
+.dm-reward-grant small {
+  display: block;
+}
+
+.dm-reward-grant small {
+  margin-top: 4px;
+  color: rgba(247, 234, 210, 0.66);
+}
+
+.dm-reward-grant button {
+  flex: 0 0 auto;
+  border: 1px solid rgba(241, 207, 123, 0.7);
+  background: #6e242c;
+  color: #fff1d0;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 10px 13px;
+  text-transform: uppercase;
+}
+
+.dm-reward-empty {
+  margin: 0;
+  color: rgba(247, 234, 210, 0.6);
+}
+
 .levelup-card.common {
   --subrace-color: var(--common);
   --subrace-glow: rgba(142, 142, 142, 0.5);

@@ -154,6 +154,7 @@ const levelUpChoiceTitle = document.querySelector("#level-up-choice-title");
 const confirmLevelUpButton = document.querySelector("#confirm-level-up");
 const floorOneRewards = document.querySelector("#floor-one-rewards");
 const rewardContext = document.querySelector("#reward-context");
+const dmRewardGrants = document.querySelector("#dm-reward-grants");
 
 let rewardPools = {};
 let originFeats = [];
@@ -178,6 +179,8 @@ let pendingSpellKind = null;
 let pendingMagicInitiate = null;
 let pendingMagicItemChoice = null;
 let pendingDungeonReturnUrl = "";
+let activeDmRewardGrant = null;
+let multiplayerSheetSyncTimer = null;
 
 function loadJson(key, fallback) {
   try {
@@ -446,6 +449,97 @@ function saveReward(reward) {
   if (character) {
     saveCharacter(character);
   }
+  scheduleMultiplayerSheetSync();
+}
+
+function multiplayerOwnMember() {
+  const state = window.avtizmMultiplayer?.getState();
+  if (!state?.connected) return null;
+  return (state.members || []).find((member) => member.user_id === state.userId) || null;
+}
+
+function multiplayerSheetState() {
+  const savedState = loadJson("avtizm4.vtt.player", {});
+  return {
+    ...savedState,
+    rewards: loadJson(rewardHistoryKey, []),
+    sheetUpdatedAt: new Date().toISOString(),
+  };
+}
+
+async function syncMultiplayerSheet() {
+  const multiplayer = window.avtizmMultiplayer;
+  const state = multiplayer?.getState();
+  const character = loadJson(savedCharacterKey, null);
+  if (!state?.connected || !character) return false;
+  return multiplayer.syncCharacter(character, multiplayerSheetState());
+}
+
+function scheduleMultiplayerSheetSync() {
+  if (multiplayerSheetSyncTimer) window.clearTimeout(multiplayerSheetSyncTimer);
+  multiplayerSheetSyncTimer = window.setTimeout(() => {
+    multiplayerSheetSyncTimer = null;
+    syncMultiplayerSheet();
+  }, 180);
+}
+
+function rewardGrantLabel(type) {
+  return {
+    "level-up": "Level-Up Reward",
+    common: "Common Reward",
+    elite: "Elite Reward",
+    boss: "Boss Reward",
+    "final-boss": "Final Boss Reward",
+    feat: "Feat Reward",
+    asi: "Ability Score Reward",
+  }[type] || "Reward";
+}
+
+function renderDmRewardGrants() {
+  if (!dmRewardGrants) return;
+  const state = window.avtizmMultiplayer?.getState();
+  const ownMember = multiplayerOwnMember();
+  const grants = Array.isArray(ownMember?.player_state?.pendingRewards)
+    ? ownMember.player_state.pendingRewards
+    : [];
+
+  if (!state?.connected) {
+    rewardContext.textContent = "Join a lobby to receive rewards from your DM.";
+    const empty = document.createElement("p");
+    empty.className = "dm-reward-empty";
+    empty.textContent = "No lobby connected.";
+    dmRewardGrants.replaceChildren(empty);
+    return;
+  }
+  if (grants.length === 0) {
+    rewardContext.textContent = "Your character is synchronized. Waiting for the DM to send a reward.";
+    const empty = document.createElement("p");
+    empty.className = "dm-reward-empty";
+    empty.textContent = "No unclaimed rewards.";
+    dmRewardGrants.replaceChildren(empty);
+    return;
+  }
+
+  rewardContext.textContent = `${grants.length} reward${grants.length === 1 ? "" : "s"} waiting. Choose one to claim.`;
+  dmRewardGrants.replaceChildren(...grants.map((grant) => {
+    const card = document.createElement("article");
+    card.className = "dm-reward-grant";
+    const details = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = rewardGrantLabel(grant.type);
+    const meta = document.createElement("small");
+    meta.textContent = "Sent by your DM";
+    details.append(title, meta);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Choose";
+    button.addEventListener("click", () => {
+      activeDmRewardGrant = grant;
+      openRewardChoice(grant.type);
+    });
+    card.append(details, button);
+    return card;
+  }));
 }
 
 function applyStatChanges(stats, changes) {
@@ -2248,6 +2342,17 @@ function saveResolvedReward(reward, overrides) {
   renderStatTracker();
   renderSavedCharacter();
   rewardContext.textContent = `${rewardDisplayName(savedReward)} added. Features and Inventory updated.`;
+  if (activeDmRewardGrant?.id) {
+    const grantId = activeDmRewardGrant.id;
+    activeDmRewardGrant = null;
+    if (multiplayerSheetSyncTimer) window.clearTimeout(multiplayerSheetSyncTimer);
+    multiplayerSheetSyncTimer = null;
+    syncMultiplayerSheet()
+      .then(() => window.avtizmMultiplayer?.consumeRewardGrant(grantId))
+      .then(() => renderDmRewardGrants());
+  } else {
+    scheduleMultiplayerSheetSync();
+  }
   if (pendingDungeonReturnUrl) {
     const returnUrl = pendingDungeonReturnUrl;
     pendingDungeonReturnUrl = "";
@@ -2561,6 +2666,27 @@ confirmLevelUpButton.addEventListener("click", confirmLevelUpChoice);
 renderSavedCharacter();
 renderStatTracker();
 renderSavedRewards();
+renderDmRewardGrants();
+["ready", "connected"].forEach((eventName) => {
+  window.addEventListener(`avtizm-multiplayer:${eventName}`, () => {
+    renderSavedCharacter();
+    renderStatTracker();
+    renderSavedRewards();
+    renderDmRewardGrants();
+    scheduleMultiplayerSheetSync();
+  });
+});
+window.addEventListener("avtizm-multiplayer:members-changed", () => {
+  renderSavedCharacter();
+  renderStatTracker();
+  renderSavedRewards();
+  renderDmRewardGrants();
+});
+window.addEventListener("avtizm-multiplayer:disconnected", renderDmRewardGrants);
+window.avtizmMultiplayer?.ready.then(() => {
+  renderDmRewardGrants();
+  scheduleMultiplayerSheetSync();
+});
 Promise.all([loadRewardPools(), loadOriginFeats(), loadGeneralFeats(), loadSpellPools(), loadMagicItemPools()])
   .then(() => {
     rewardActionButtons.forEach((button) => {

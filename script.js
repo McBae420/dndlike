@@ -1357,7 +1357,7 @@ rerollButton.addEventListener("click", () => {
   state.originFeat = null;
   state.humanFeat = null;
   state.pendingMagicInitiateFeat = null;
-  continueButton.textContent = "Continue";
+  continueButton.textContent = "Open Character Sheet";
   continueButton.disabled = false;
   renderRaceOptions();
   showStage("race");

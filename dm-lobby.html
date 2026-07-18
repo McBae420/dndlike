@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DM Lobby - DnD Roguelike</title>
+    <link rel="stylesheet" href="lobby.css?v=1" />
+  </head>
+  <body data-vtt-view="dm" data-lobby-view="dm">
+    <main class="lobby-app">
+      <header class="lobby-header dungeon-header">
+        <div>
+          <p class="eyebrow">Dungeon Master</p>
+          <h1>Party Roster</h1>
+        </div>
+        <nav class="lobby-nav" aria-label="Page links">
+          <a href="index.html">Change role</a>
+        </nav>
+      </header>
+
+      <section class="dm-overview">
+        <div>
+          <p class="eyebrow">Live lobby</p>
+          <h2>Current Players</h2>
+          <p>Share the game code above. New players appear here automatically.</p>
+        </div>
+        <div id="roster-count" class="roster-count">0 players</div>
+      </section>
+
+      <section id="dm-roster" class="dm-roster" aria-live="polite">
+        <article class="empty-roster">
+          <h2>Create a lobby to begin</h2>
+          <p>Your players and their characters will appear here.</p>
+        </article>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=1"></script>
+    <script src="multiplayer.js?v=6"></script>
+    <script src="lobby.js?v=1"></script>
+  </body>
+</html>

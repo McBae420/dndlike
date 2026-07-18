@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Join Lobby - DnD Roguelike</title>
+    <link rel="stylesheet" href="lobby.css?v=1" />
+  </head>
+  <body data-vtt-view="player" data-lobby-view="player">
+    <main class="lobby-app">
+      <header class="lobby-header dungeon-header">
+        <div>
+          <p class="eyebrow">Player Lobby</p>
+          <h1>Join the Party</h1>
+        </div>
+        <nav class="lobby-nav" aria-label="Page links">
+          <a href="index.html">Change role</a>
+        </nav>
+      </header>
+
+      <section class="lobby-steps" aria-label="Player setup">
+        <article>
+          <span>1</span>
+          <div>
+            <strong>Join the lobby</strong>
+            <p>Enter the six-character code from your DM.</p>
+          </div>
+        </article>
+        <article>
+          <span>2</span>
+          <div>
+            <strong>Create your character</strong>
+            <p>Choose your race, class, spells, and starting feature.</p>
+          </div>
+        </article>
+        <article>
+          <span>3</span>
+          <div>
+            <strong>Open your sheet</strong>
+            <p>Your character and rewards stay linked to this lobby.</p>
+          </div>
+        </article>
+      </section>
+
+      <section id="player-lobby-status" class="lobby-focus-card" aria-live="polite">
+        <p class="eyebrow">First step</p>
+        <h2>Enter the game code above</h2>
+        <p>Your DM will see you appear in the party roster as soon as you join.</p>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=1"></script>
+    <script src="multiplayer.js?v=6"></script>
+    <script src="lobby.js?v=1"></script>
+  </body>
+</html>
