@@ -173,6 +173,7 @@ let multiplayerSyncTimer = null;
 let multiplayerSyncInFlight = false;
 let multiplayerSyncQueued = false;
 let applyingMultiplayerState = false;
+let queuedPlayerDungeonState = null;
 
 const stageSelect = document.querySelector("#dungeon-stage");
 const viewModeSelect = document.querySelector("#view-mode");
@@ -1874,14 +1875,13 @@ function toggleDoorIfAllowed(x, y) {
   if (vttMode === "player" && !activePlayerAdjacentTo({ x, y })) return false;
   const multiplayerState = window.avtizmMultiplayer?.getState();
   if (vttMode === "player" && multiplayerState?.connected) {
+    const shouldOpen = tile.type !== "open door";
     window.avtizmMultiplayer.submitAction("toggle-door", {
       x,
       y,
-      shouldOpen: tile.type !== "open door",
+      shouldOpen,
     });
-    setSelectedTile({ x, y });
-    renderInspector();
-    return true;
+    return setDoorOpenState(x, y, shouldOpen);
   }
   return setDoorOpenState(x, y, tile.type !== "open door");
 }
@@ -2104,6 +2104,8 @@ async function finishTokenDrag(event) {
 
   if (token && path.length > 1) {
     await submitOrAnimateMovement(token, path);
+  } else {
+    flushQueuedPlayerDungeonState();
   }
   renderInspector();
 }
@@ -2111,13 +2113,12 @@ async function finishTokenDrag(event) {
 async function submitOrAnimateMovement(token, path) {
   const multiplayerState = window.avtizmMultiplayer?.getState();
   if (vttMode === "player" && multiplayerState?.connected) {
-    const actionId = await window.avtizmMultiplayer.submitAction("move-token", {
+    const actionRequest = window.avtizmMultiplayer.submitAction("move-token", {
       tokenId: token.id,
       path: path.map((point) => ({ x: point.x, y: point.y })),
-    });
-    if (!actionId) return false;
+    }).catch(() => null);
     await animateTokenAlongPath(token, path, 45);
-    return true;
+    return Boolean(await actionRequest);
   }
   await animateTokenAlongPath(token, path);
   saveDungeonState();
@@ -2153,6 +2154,7 @@ async function animateTokenAlongPath(token, path, stepDuration = 95) {
     const finalStep = path[path.length - 1];
     if (finalStep) refreshTokenTiles(finalStep);
     tokenMovementAnimating = false;
+    flushQueuedPlayerDungeonState();
   }
 }
 
@@ -2219,6 +2221,7 @@ function cancelTokenDrag() {
   updatePathDistance("", false);
   applyDynamicTileClasses();
   if (token) refreshTokenTiles({ x: token.x, y: token.y });
+  flushQueuedPlayerDungeonState();
 }
 
 function updatePathDistance(text, blocked) {
@@ -3420,6 +3423,16 @@ async function syncMultiplayerDungeon() {
 
 function applyMultiplayerDungeonState(nextState) {
   if (!nextState?.grid || !Array.isArray(nextState.tokens)) return;
+  if (vttMode === "player" && (tokenMovementAnimating || tokenDragState)) {
+    queuedPlayerDungeonState = nextState;
+    return;
+  }
+  const preservedPlayerSelection = vttMode === "player" && selectedTile
+    ? { ...selectedTile }
+    : null;
+  const preservedPlayerScroll = vttMode === "player" && gridElement
+    ? { left: gridElement.scrollLeft, top: gridElement.scrollTop }
+    : null;
   applyingMultiplayerState = true;
   try {
     dungeon = nextState;
@@ -3429,12 +3442,30 @@ function applyMultiplayerDungeonState(nextState) {
       : dungeon.tokens.find((token) => token.type === "player")?.id
         || dungeon.tokens[0]?.id
         || null;
-    selectedTile = null;
+    selectedTile = preservedPlayerSelection;
     localStorage.setItem(dungeonStorageKey, JSON.stringify(dungeon));
     render();
+    if (preservedPlayerScroll) {
+      gridElement.scrollLeft = preservedPlayerScroll.left;
+      gridElement.scrollTop = preservedPlayerScroll.top;
+    }
   } finally {
     applyingMultiplayerState = false;
   }
+}
+
+function flushQueuedPlayerDungeonState() {
+  if (
+    vttMode !== "player"
+    || tokenMovementAnimating
+    || tokenDragState
+    || !queuedPlayerDungeonState
+  ) {
+    return;
+  }
+  const nextState = queuedPlayerDungeonState;
+  queuedPlayerDungeonState = null;
+  applyMultiplayerDungeonState(nextState);
 }
 
 function actionMember(action) {
@@ -3615,9 +3646,14 @@ window.addEventListener("avtizm-multiplayer:dungeon-state", (event) => {
 window.addEventListener("avtizm-multiplayer:members-changed", () => {
   const multiplayerState = window.avtizmMultiplayer?.getState();
   if (vttMode === "player" && multiplayerState?.tokenId) {
+    const previousTokenId = activePlayerTokenId;
     activePlayerTokenId = multiplayerState.tokenId;
     normalizeActivePlayerToken();
-    render();
+    const tokensToRefresh = dungeon?.tokens.filter((token) => (
+      token.id === previousTokenId || token.id === activePlayerTokenId
+    )) || [];
+    tokensToRefresh.forEach((token) => refreshTokenTiles({ x: token.x, y: token.y }));
+    renderPlayerSidebarSafely();
     return;
   }
   if (vttMode === "dm") {
