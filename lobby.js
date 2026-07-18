@@ -4,9 +4,11 @@
   const roster = document.querySelector("#dm-roster");
   const rosterCount = document.querySelector("#roster-count");
   const characterStorageKey = "avtizm4.character";
+  const characterCampaignStorageKey = "avtizm4.characterCampaign";
 
-  function loadCharacter() {
+  function loadCharacter(campaignId) {
     try {
+      if (localStorage.getItem(characterCampaignStorageKey) !== campaignId) return null;
       return JSON.parse(localStorage.getItem(characterStorageKey)) || null;
     } catch (error) {
       console.warn(error);
@@ -48,35 +50,27 @@
       return;
     }
 
-    const character = loadCharacter();
+    const character = loadCharacter(state.campaignId);
     const ready = hasCharacter(character);
+    if (!ready) {
+      window.location.replace("character-builder.html?from=lobby");
+      return;
+    }
     const eyebrow = document.createElement("p");
     eyebrow.className = "eyebrow";
-    eyebrow.textContent = ready ? "Character found" : "Lobby joined";
+    eyebrow.textContent = "Character ready";
     const title = document.createElement("h2");
-    title.textContent = ready
-      ? `${choiceName(character.race)} ${choiceName(character.class)}`
-      : "Now create your character";
+    title.textContent = `${choiceName(character.race)} ${choiceName(character.class)}`;
     const copy = document.createElement("p");
-    copy.textContent = ready
-      ? "Continue with this character or build a new one for this lobby."
-      : "Choose your race, class, and starting features. You will go straight to your sheet when finished.";
+    copy.textContent = "This is your locked character for this game.";
     const actions = document.createElement("div");
     actions.className = "lobby-actions";
 
     const primary = document.createElement("a");
     primary.className = "lobby-button";
-    primary.href = ready ? "future.html" : "character-builder.html?from=lobby";
-    primary.textContent = ready ? "Open Character Sheet" : "Create Character";
+    primary.href = "future.html";
+    primary.textContent = "Open Character Sheet";
     actions.append(primary);
-
-    if (ready) {
-      const rebuild = document.createElement("a");
-      rebuild.className = "lobby-button secondary";
-      rebuild.href = "character-builder.html?from=lobby";
-      rebuild.textContent = "Create a New Character";
-      actions.append(rebuild);
-    }
     playerStatus.replaceChildren(eyebrow, title, copy, actions);
   }
 

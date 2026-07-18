@@ -18,8 +18,10 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
   const characterScope = document.body.dataset.multiplayerScope === "characters";
   const sessionStorageKey = `avtizm4.multiplayer.${mode}`;
   const characterStorageKey = "avtizm4.character";
+  const characterCampaignStorageKey = "avtizm4.characterCampaign";
   const rewardStorageKey = "avtizm4.rewards";
   const playerStateStorageKey = "avtizm4.vtt.player";
+  const pendingRewardStorageKey = "avtizm4.pendingDungeonReward";
 
   const state = {
     available: Boolean(config?.url && config?.publishableKey && supabaseFactory),
@@ -105,6 +107,16 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
       campaignName: state.campaignName,
       joinCode: state.joinCode,
     }));
+  }
+
+  function clearLocalPlayerData() {
+    [
+      characterStorageKey,
+      characterCampaignStorageKey,
+      rewardStorageKey,
+      playerStateStorageKey,
+      pendingRewardStorageKey,
+    ].forEach((key) => localStorage.removeItem(key));
   }
 
   function createBar() {
@@ -283,14 +295,15 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
     const { data, error } = await state.client.rpc("join_campaign", {
       p_code: code,
       p_display_name: displayName,
-      p_character: loadJson(characterStorageKey, {}),
-      p_player_state: loadJson(playerStateStorageKey, {}),
+      p_character: {},
+      p_player_state: {},
     });
     if (error) {
       setBusy(false, error.message);
       return;
     }
     const result = data?.[0];
+    clearLocalPlayerData();
     await connectToCampaign({
       campaignId: result.campaign_id,
       role: result.member_role,
@@ -420,11 +433,13 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
   function restoreOwnCharacter(row) {
     if (!row?.character || Object.keys(row.character).length === 0) return;
     const localCharacter = loadJson(characterStorageKey, null);
+    const localCampaignId = localStorage.getItem(characterCampaignStorageKey);
     const localTime = Date.parse(localCharacter?.savedAt || 0) || 0;
     const remoteTime = Date.parse(row.character?.savedAt || row.updated_at || 0) || 0;
-    if (!localCharacter || remoteTime > localTime) {
+    if (!localCharacter || localCampaignId !== state.campaignId || remoteTime > localTime) {
       localStorage.setItem(characterStorageKey, JSON.stringify(row.character));
     }
+    localStorage.setItem(characterCampaignStorageKey, state.campaignId);
     if (row.player_state && Object.keys(row.player_state).length > 0) {
       const localState = loadJson(playerStateStorageKey, {});
       localStorage.setItem(playerStateStorageKey, JSON.stringify({
@@ -875,9 +890,11 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
   const roster = document.querySelector("#dm-roster");
   const rosterCount = document.querySelector("#roster-count");
   const characterStorageKey = "avtizm4.character";
+  const characterCampaignStorageKey = "avtizm4.characterCampaign";
 
-  function loadCharacter() {
+  function loadCharacter(campaignId) {
     try {
+      if (localStorage.getItem(characterCampaignStorageKey) !== campaignId) return null;
       return JSON.parse(localStorage.getItem(characterStorageKey)) || null;
     } catch (error) {
       console.warn(error);
@@ -919,35 +936,27 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
       return;
     }
 
-    const character = loadCharacter();
+    const character = loadCharacter(state.campaignId);
     const ready = hasCharacter(character);
+    if (!ready) {
+      window.location.replace("character-builder.html?from=lobby");
+      return;
+    }
     const eyebrow = document.createElement("p");
     eyebrow.className = "eyebrow";
-    eyebrow.textContent = ready ? "Character found" : "Lobby joined";
+    eyebrow.textContent = "Character ready";
     const title = document.createElement("h2");
-    title.textContent = ready
-      ? `${choiceName(character.race)} ${choiceName(character.class)}`
-      : "Now create your character";
+    title.textContent = `${choiceName(character.race)} ${choiceName(character.class)}`;
     const copy = document.createElement("p");
-    copy.textContent = ready
-      ? "Continue with this character or build a new one for this lobby."
-      : "Choose your race, class, and starting features. You will go straight to your sheet when finished.";
+    copy.textContent = "This is your locked character for this game.";
     const actions = document.createElement("div");
     actions.className = "lobby-actions";
 
     const primary = document.createElement("a");
     primary.className = "lobby-button";
-    primary.href = ready ? "future.html" : "character-builder.html?from=lobby";
-    primary.textContent = ready ? "Open Character Sheet" : "Create Character";
+    primary.href = "future.html";
+    primary.textContent = "Open Character Sheet";
     actions.append(primary);
-
-    if (ready) {
-      const rebuild = document.createElement("a");
-      rebuild.className = "lobby-button secondary";
-      rebuild.href = "character-builder.html?from=lobby";
-      rebuild.textContent = "Create a New Character";
-      actions.append(rebuild);
-    }
     playerStatus.replaceChildren(eyebrow, title, copy, actions);
   }
 

@@ -5,8 +5,10 @@
   const characterScope = document.body.dataset.multiplayerScope === "characters";
   const sessionStorageKey = `avtizm4.multiplayer.${mode}`;
   const characterStorageKey = "avtizm4.character";
+  const characterCampaignStorageKey = "avtizm4.characterCampaign";
   const rewardStorageKey = "avtizm4.rewards";
   const playerStateStorageKey = "avtizm4.vtt.player";
+  const pendingRewardStorageKey = "avtizm4.pendingDungeonReward";
 
   const state = {
     available: Boolean(config?.url && config?.publishableKey && supabaseFactory),
@@ -92,6 +94,16 @@
       campaignName: state.campaignName,
       joinCode: state.joinCode,
     }));
+  }
+
+  function clearLocalPlayerData() {
+    [
+      characterStorageKey,
+      characterCampaignStorageKey,
+      rewardStorageKey,
+      playerStateStorageKey,
+      pendingRewardStorageKey,
+    ].forEach((key) => localStorage.removeItem(key));
   }
 
   function createBar() {
@@ -270,14 +282,15 @@
     const { data, error } = await state.client.rpc("join_campaign", {
       p_code: code,
       p_display_name: displayName,
-      p_character: loadJson(characterStorageKey, {}),
-      p_player_state: loadJson(playerStateStorageKey, {}),
+      p_character: {},
+      p_player_state: {},
     });
     if (error) {
       setBusy(false, error.message);
       return;
     }
     const result = data?.[0];
+    clearLocalPlayerData();
     await connectToCampaign({
       campaignId: result.campaign_id,
       role: result.member_role,
@@ -407,11 +420,13 @@
   function restoreOwnCharacter(row) {
     if (!row?.character || Object.keys(row.character).length === 0) return;
     const localCharacter = loadJson(characterStorageKey, null);
+    const localCampaignId = localStorage.getItem(characterCampaignStorageKey);
     const localTime = Date.parse(localCharacter?.savedAt || 0) || 0;
     const remoteTime = Date.parse(row.character?.savedAt || row.updated_at || 0) || 0;
-    if (!localCharacter || remoteTime > localTime) {
+    if (!localCharacter || localCampaignId !== state.campaignId || remoteTime > localTime) {
       localStorage.setItem(characterStorageKey, JSON.stringify(row.character));
     }
+    localStorage.setItem(characterCampaignStorageKey, state.campaignId);
     if (row.player_state && Object.keys(row.player_state).length > 0) {
       const localState = loadJson(playerStateStorageKey, {});
       localStorage.setItem(playerStateStorageKey, JSON.stringify({

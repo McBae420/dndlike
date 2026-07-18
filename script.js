@@ -165,6 +165,8 @@ const confirmHumanFeatButton = document.querySelector("#confirm-human-feat");
 const rerollButton = document.querySelector("#reroll-button");
 const continueButton = document.querySelector("#continue-button");
 const savedCharacterKey = "avtizm4.character";
+const characterCampaignStorageKey = "avtizm4.characterCampaign";
+const playerCampaignStorageKey = "avtizm4.multiplayer.player";
 const rewardHistoryKey = "avtizm4.rewards";
 const playerVttStateKey = "avtizm4.vtt.player";
 const startingInventory = [
@@ -207,6 +209,28 @@ let spellMap = {
   level1: [],
 };
 let originFeats = [];
+
+function activePlayerCampaignId() {
+  try {
+    return JSON.parse(localStorage.getItem(playerCampaignStorageKey))?.campaignId || "";
+  } catch (error) {
+    console.warn(error);
+    return "";
+  }
+}
+
+function hasLockedCharacter(campaignId) {
+  if (!campaignId || localStorage.getItem(characterCampaignStorageKey) !== campaignId) {
+    return false;
+  }
+  try {
+    const character = JSON.parse(localStorage.getItem(savedCharacterKey));
+    return Boolean(character?.race?.name && character?.class?.name);
+  } catch (error) {
+    console.warn(error);
+    return false;
+  }
+}
 
 function shuffle(items) {
   return [...items].sort(() => Math.random() - 0.5);
@@ -687,8 +711,12 @@ function buildSavedCharacter() {
 }
 
 function saveCharacter() {
-  if (!state.race || !state.class || !state.originFeat) return;
+  if (!state.race || !state.class || !state.originFeat) return false;
+  const campaignId = activePlayerCampaignId();
+  if (!campaignId || hasLockedCharacter(campaignId)) return false;
   localStorage.setItem(savedCharacterKey, JSON.stringify(buildSavedCharacter()));
+  localStorage.setItem(characterCampaignStorageKey, campaignId);
+  return true;
 }
 
 function renderRaceOptions() {
@@ -1141,7 +1169,6 @@ function renderSummary() {
   document.querySelector("#summary-class-name").textContent = state.class.name;
   document.querySelector("#summary-class-description").textContent =
     featureText(state.class.features);
-  saveCharacter();
 }
 
 async function loadRaceFeatures() {
@@ -1357,27 +1384,33 @@ rerollButton.addEventListener("click", () => {
   state.originFeat = null;
   state.humanFeat = null;
   state.pendingMagicInitiateFeat = null;
-  continueButton.textContent = "Open Character Sheet";
+  continueButton.textContent = "Lock Character & Open Sheet";
   continueButton.disabled = false;
   renderRaceOptions();
   showStage("race");
 });
 
 continueButton.addEventListener("click", () => {
-  saveCharacter();
-  window.location.href = "future.html";
+  if (saveCharacter()) window.location.href = "future.html";
 });
 
-try {
-  renderRaceOptions();
-Promise.all([
-  loadRaceFeatures(),
-  loadSubraceFeatures(),
-  loadClassFeatures(),
-  loadClassOptions(),
-  loadSpells(),
-  loadOriginFeats(),
-]).then(renderRaceOptions);
-} catch (error) {
-  console.error("Game failed to start", error);
+const activeCampaignId = activePlayerCampaignId();
+if (!activeCampaignId) {
+  window.location.replace("player-lobby.html");
+} else if (hasLockedCharacter(activeCampaignId)) {
+  window.location.replace("future.html");
+} else {
+  try {
+    renderRaceOptions();
+    Promise.all([
+      loadRaceFeatures(),
+      loadSubraceFeatures(),
+      loadClassFeatures(),
+      loadClassOptions(),
+      loadSpells(),
+      loadOriginFeats(),
+    ]).then(renderRaceOptions);
+  } catch (error) {
+    console.error("Game failed to start", error);
+  }
 }
