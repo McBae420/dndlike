@@ -19,6 +19,7 @@
     tokenId: null,
     displayName: "",
     members: [],
+    tokenPositions: [],
     client: null,
     channel: null,
   };
@@ -381,6 +382,33 @@
     }
   }
 
+  function rememberTokenPosition(position) {
+    if (!position?.token_id) return;
+    const index = state.tokenPositions.findIndex(
+      (item) => item.token_id === position.token_id,
+    );
+    if (index >= 0) {
+      state.tokenPositions[index] = position;
+    } else {
+      state.tokenPositions.push(position);
+    }
+  }
+
+  async function refreshTokenPositions() {
+    if (!state.connected) return [];
+    const { data, error } = await state.client
+      .from("campaign_token_positions")
+      .select("campaign_id,token_id,owner_user_id,dungeon_id,x,y,revision,updated_at")
+      .eq("campaign_id", state.campaignId);
+    if (error) {
+      reportError("Could not load token positions", error);
+      return state.tokenPositions;
+    }
+    state.tokenPositions = data || [];
+    emit("token-positions", { positions: state.tokenPositions });
+    return state.tokenPositions;
+  }
+
   async function subscribeToCampaign() {
     if (state.channel) await state.client.removeChannel(state.channel);
     state.channel = state.client
@@ -404,6 +432,27 @@
           filter: `campaign_id=eq.${state.campaignId}`,
         },
         () => refreshMembers(),
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "campaign_token_positions",
+          filter: `campaign_id=eq.${state.campaignId}`,
+        },
+        (payload) => {
+          if (payload.eventType === "DELETE") {
+            state.tokenPositions = state.tokenPositions.filter(
+              (item) => item.token_id !== payload.old?.token_id,
+            );
+            emit("token-position-deleted", { position: payload.old });
+            return;
+          }
+          if (payload.new?.campaign_id !== state.campaignId) return;
+          rememberTokenPosition(payload.new);
+          emit("token-position", { position: payload.new });
+        },
       );
 
     if (mode === "dm") {
@@ -418,38 +467,23 @@
         (payload) => emit("game-action", { action: payload.new }),
       );
     } else {
-      state.channel
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "player_views",
-            filter: `user_id=eq.${state.userId}`,
-          },
-          (payload) => {
-            if (payload.new?.campaign_id === state.campaignId) {
-              emit("dungeon-state", {
-                state: payload.new.dungeon_state,
-                revision: payload.new.revision,
-              });
-            }
-          },
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "UPDATE",
-            schema: "public",
-            table: "player_actions",
-            filter: `user_id=eq.${state.userId}`,
-          },
-          (payload) => {
-            if (payload.new?.campaign_id === state.campaignId) {
-              emit("action-complete", { action: payload.new });
-            }
-          },
-        );
+      state.channel.on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "player_views",
+          filter: `user_id=eq.${state.userId}`,
+        },
+        (payload) => {
+          if (payload.new?.campaign_id === state.campaignId) {
+            emit("dungeon-state", {
+              state: payload.new.dungeon_state,
+              revision: payload.new.revision,
+            });
+          }
+        },
+      );
     }
 
     state.channel.subscribe((status) => {
@@ -471,6 +505,7 @@
         .select("dungeon_state,revision")
         .eq("campaign_id", state.campaignId)
         .maybeSingle();
+      await refreshTokenPositions();
       if (data?.dungeon_state) {
         emit("dungeon-state", {
           state: data.dungeon_state,
@@ -494,6 +529,7 @@
       .eq("campaign_id", state.campaignId)
       .eq("user_id", state.userId)
       .maybeSingle();
+    await refreshTokenPositions();
     if (data?.dungeon_state) {
       emit("dungeon-state", {
         state: data.dungeon_state,
@@ -519,6 +555,7 @@
     state.joinCode = "";
     state.tokenId = null;
     state.members = [];
+    state.tokenPositions = [];
     state.error = "";
     persistSession();
     renderBar();
@@ -575,6 +612,40 @@
     if (error) reportError("Could not save player views", error);
   }
 
+  async function syncTokenPositions(tokens) {
+    if (!state.connected || mode !== "dm" || !Array.isArray(tokens)) return [];
+    const { data, error } = await state.client.rpc("sync_campaign_token_positions", {
+      p_campaign_id: state.campaignId,
+      p_tokens: tokens,
+    });
+    if (error) {
+      reportError("Could not initialize token positions", error);
+      return [];
+    }
+    state.tokenPositions = data || [];
+    emit("token-positions", { positions: state.tokenPositions });
+    return state.tokenPositions;
+  }
+
+  async function moveToken(tokenId, path, expectedRevision = null) {
+    if (!state.connected || !tokenId || !Array.isArray(path)) return null;
+    const { data, error } = await state.client
+      .rpc("move_campaign_token", {
+        p_campaign_id: state.campaignId,
+        p_token_id: tokenId,
+        p_path: path,
+        p_expected_revision: expectedRevision,
+      })
+      .single();
+    if (error) {
+      reportError("Could not move token", error);
+      return null;
+    }
+    rememberTokenPosition(data);
+    emit("token-position", { position: data });
+    return data;
+  }
+
   async function submitAction(actionType, payload) {
     if (!state.connected || mode !== "player") return null;
     const { data, error } = await state.client
@@ -621,6 +692,7 @@
       tokenId: state.tokenId,
       displayName: state.displayName,
       members: state.members,
+      tokenPositions: state.tokenPositions,
     };
   }
 
@@ -629,9 +701,12 @@
     getState,
     refreshMembers,
     refreshDungeonState,
+    refreshTokenPositions,
     syncCharacter,
     saveDmState,
     savePlayerViews,
+    syncTokenPositions,
+    moveToken,
     submitAction,
     completeAction,
   };

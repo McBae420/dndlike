@@ -11,7 +11,8 @@ secret key, service-role key, or database password in the website.
 
 The database schema is stored in:
 
-`supabase/migrations/20260718110000_multiplayer.sql`
+- `supabase/migrations/20260718110000_multiplayer.sql`
+- `supabase/migrations/20260718133000_direct_token_sync.sql`
 
 Anonymous sign-ins must be enabled in the Supabase dashboard under
 Authentication settings. Before making the site broadly public, enable CAPTCHA
@@ -24,16 +25,23 @@ protection for anonymous sign-ins.
 3. Each player builds a character, opens `dungeon-player.html`, and joins with
    the code and a display name.
 4. Supabase assigns every player a separate authenticated identity and token.
-5. The DM stores the authoritative dungeon and validates player actions.
-6. Each player receives a separate fog-of-war map calculated from their own
+5. Supabase stores each player token in its own authoritative position row.
+6. A secured database function validates token ownership, path adjacency,
+   walkable tiles, movement allowance, and position revision.
+7. Every DM and player page subscribes directly to token position changes.
+8. Each player receives a separate fog-of-war map calculated from their own
    token, character vision, and light effects.
 
-Players move by dragging their own token. The DM validates the path and movement
-allowance before the new position is broadcast, while the player sees a fast
-hex-by-hex movement animation. Vision uses the character's vision stat, and an
-active torch can extend it to 40 feet. Normal and locked doors do not block
-line-of-sight; walls and secret doors do. Explored tiles remain remembered,
-while creatures outside the player's current line of sight are hidden.
+Players move by dragging their own token. The local page runs the same
+hex-by-hex animation as the DM view while the database validates and commits the
+move. The small position update is broadcast directly to every connected page;
+it no longer needs to pass through the DM browser. Fog updates remain
+personalized and cannot overwrite authoritative token coordinates.
+
+Vision uses the character's vision stat, and an active torch can extend it to
+40 feet. Normal and locked doors do not block vision; walls and secret doors
+do. Explored tiles remain remembered, while creatures outside the player's
+current sight are hidden.
 
 Use a different browser profile or a private window when testing a second
 player. The app intentionally uses separate DM and player authentication storage
