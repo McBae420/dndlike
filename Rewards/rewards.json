@@ -1,0 +1,810 @@
+{
+  "shared": {
+    "floor1": {
+      "common": [
+        {
+          "name": "Origin Spark",
+          "category": "General",
+          "text": "Gain 1 random Origin feat."
+        },
+        {
+          "name": "Wandering Training",
+          "category": "Stat",
+          "text": "Gain +1 to one random ability score."
+        },
+        {
+          "name": "Potion Belt",
+          "category": "General",
+          "text": "Gain 2 healing potions."
+        }
+      ],
+      "uncommon": [
+        {
+          "name": "Heroic Trick",
+          "category": "General",
+          "text": "Gain 1 random feat."
+        },
+        {
+          "name": "Sudden Growth",
+          "category": "Stat",
+          "text": "Gain +2 to one random ability score."
+        },
+        {
+          "name": "Minor Treasure",
+          "category": "Relic",
+          "text": "Gain 1 random common magic item."
+        },
+        {
+          "name": "Potion Stockpile",
+          "category": "General",
+          "text": "Gain 3 healing potions or 1 greater healing potion."
+        },
+        {
+          "name": "Battle Ready",
+          "category": "General",
+          "text": "At the start of each combat, gain temporary HP equal to your Proficiency Bonus."
+        }
+      ],
+      "rare": [
+        {
+          "name": "Twin Talents",
+          "category": "General",
+          "text": "Gain 2 random feats."
+        },
+        {
+          "name": "Double Growth",
+          "category": "Stat",
+          "text": "Gain +2 to one random ability score twice. Roll separately each time."
+        },
+        {
+          "name": "Last Stand",
+          "category": "General",
+          "text": "Once per Long Rest, when you drop to 0 HP, drop to 1 HP instead."
+        },
+        {
+          "name": "Greater Treasure",
+          "category": "Relic",
+          "text": "Gain 1 random uncommon magic item."
+        }
+      ],
+      "legendary": [
+        {
+          "name": "Heroic Relic",
+          "category": "Relic",
+          "text": "Gain 1 random rare magic item."
+        },
+        {
+          "name": "Perfected Form",
+          "category": "Stat",
+          "text": "Gain +2 to one random ability score three times. Roll separately each time."
+        },
+        {
+          "name": "Surge of Fate",
+          "category": "General",
+          "text": "Once, take one additional action on your turn."
+        }
+      ]
+    },
+    "floor2": {
+      "common": [
+        {
+          "name": "Battle Rhythm",
+          "category": "General",
+          "text": "Once per combat, gain Advantage on an attack after an ally hits the same target."
+        },
+        {
+          "name": "Improved Vitality",
+          "category": "Stat",
+          "text": "Increase your maximum HP by 6."
+        }
+      ],
+      "uncommon": [
+        {
+          "name": "Subclass Technique",
+          "category": "Subclass",
+          "text": "Gain a core subclass upgrade appropriate to your chosen subclass."
+        },
+        {
+          "name": "Potent Mana",
+          "category": "Spell",
+          "text": "Gain 2 max Mana."
+        }
+      ],
+      "rare": [
+        {
+          "name": "Divine Smite Style",
+          "category": "Class",
+          "text": "Once per combat, add a burst of radiant or class-appropriate damage to a hit."
+        },
+        {
+          "name": "Action Surge Style",
+          "category": "Class",
+          "text": "Once per Short Rest, take one extra action on your turn."
+        }
+      ],
+      "legendary": [
+        {
+          "name": "Aura Core",
+          "category": "Class",
+          "text": "You and nearby allies gain a powerful defensive aura scaled for Floor 2."
+        }
+      ]
+    },
+    "floor3": {
+      "common": [
+        {
+          "name": "Veteran Reflex",
+          "category": "General",
+          "text": "Once per combat, reroll a failed saving throw and use the new result."
+        },
+        {
+          "name": "Greater Vitality",
+          "category": "Stat",
+          "text": "Increase your maximum HP by 10."
+        }
+      ],
+      "uncommon": [
+        {
+          "name": "Major Spell Power",
+          "category": "Spell",
+          "text": "Gain a high-impact spell reward appropriate to Floor 3."
+        },
+        {
+          "name": "Greater Subclass Upgrade",
+          "category": "Subclass",
+          "text": "Gain a strong subclass upgrade or expand an existing subclass feature."
+        }
+      ],
+      "rare": [
+        {
+          "name": "Extra Attack Upgrade",
+          "category": "Class",
+          "text": "Improve your attack routine with an additional attack or equivalent class-scaled effect."
+        },
+        {
+          "name": "Expanded Aura",
+          "category": "Class",
+          "text": "Your aura-style rewards grow stronger or affect a wider area."
+        }
+      ],
+      "legendary": [
+        {
+          "name": "Build Breaker",
+          "category": "Legendary",
+          "text": "Gain a powerful endgame effect that changes how your build plays."
+        }
+      ]
+    },
+    "final": {
+      "rare": [
+        {
+          "name": "Final Ascension",
+          "category": "Class",
+          "text": "Gain a major capstone-style feature for the final battles."
+        },
+        {
+          "name": "Mythic Relic",
+          "category": "Relic",
+          "text": "Gain a relic with a powerful combat-defining effect."
+        }
+      ],
+      "legendary": [
+        {
+          "name": "Legendary Relic",
+          "category": "Relic",
+          "text": "Gain a legendary relic with a build-defining or encounter-breaking effect."
+        },
+        {
+          "name": "Endgame Apotheosis",
+          "category": "Legendary",
+          "text": "Gain a final reward that pushes your character beyond normal class limits."
+        }
+      ]
+    }
+  },
+  "classes": {
+    "Barbarian": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Reckless Momentum",
+            "category": "Class",
+            "text": "Once per combat, after you hit with a melee attack, gain temporary HP equal to your Proficiency Bonus."
+          },
+          {
+            "name": "Weapon Mastery",
+            "category": "Class",
+            "text": "Choose two Simple or Martial melee weapons. You can use their Weapon Mastery properties. Whenever you finish a Long Rest, you may change one of these weapon choices."
+          },
+          {
+            "name": "Danger Sense",
+            "category": "Class",
+            "text": "You have Advantage on Dexterity saving throws unless you have the Incapacitated condition."
+          },
+          {
+            "name": "Reckless Attack",
+            "category": "Class",
+            "text": "When you make your first attack roll on your turn, you may attack recklessly. Until the start of your next turn, your attack rolls using Strength have Advantage, but attack rolls against you also have Advantage."
+          },
+          {
+            "name": "Primal Knowledge",
+            "category": "Class",
+            "text": "Choose one skill: Animal Handling, Athletics, Intimidation, Nature, Perception, or Survival. You gain proficiency in that skill. While raging, you may use Strength for checks with that skill."
+          },
+          {
+            "name": "Battle Roar",
+            "category": "Class",
+            "text": "When you enter Rage, gain Temporary HP equal to your Proficiency Bonus + your CON modifier."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Iron Hide",
+            "category": "Class",
+            "text": "While you are using Unarmored Defense, reduce bludgeoning, piercing, and slashing damage you take by 1."
+          },
+          {
+            "name": "Ferocious Recovery",
+            "category": "Class",
+            "text": "Once per combat while raging, when you start your turn above 0 HP and below half your hit points, regain hit points equal to your Proficiency Bonus."
+          },
+          {
+            "name": "Fast Movement",
+            "category": "Class",
+            "text": "Your speed increases by 10 feet while you aren't wearing Heavy armor."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Extra Attack",
+            "category": "Class",
+            "text": "When you take the Attack action on your turn, you can make two attacks instead of one."
+          },
+          {
+            "name": "Greater Rage",
+            "category": "Class",
+            "text": "While raging, your Rage damage bonus increases by +1."
+          },
+          {
+            "name": "Feral Instinct",
+            "category": "Class",
+            "text": "You have Advantage on Initiative rolls. If you enter combat while conscious, you may enter Rage before the first turn begins."
+          },
+          {
+            "name": "Titan Grip",
+            "category": "Class",
+            "text": "While raging, you count as one size larger for Grapple, Shove, carrying capacity, and moving creatures you are grappling. In addition, your melee attacks deal +1 damage to creatures you are grappling."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Brutal Strike",
+            "category": "Class",
+            "text": "If you use Reckless Attack, you can forgo any Advantage on one Strength-based attack roll of your choice on your turn. The chosen attack roll mustn't have Disadvantage. If the chosen attack roll hits, the target takes an extra 1d10 damage of the same type dealt by the weapon or Unarmed Strike, and you can cause one Brutal Strike effect of your choice. You have the following effect options. Forceful Blow. The target is pushed 15 feet straight away from you. You can then move up to half your Speed straight toward the target without provoking Opportunity Attacks. Hamstring Blow. The target's Speed is reduced by 15 feet until the start of your next turn. A target can be affected by only one Hamstring Blow at a time - the most recent one."
+          },
+          {
+            "name": "Spirit-Breaker Rage",
+            "category": "Class",
+            "text": "While your Rage is active, you have Resistance to Force, Necrotic, Psychic, and Radiant damage."
+          }
+        ]
+      }
+    },
+    "Bard": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Inspiring Recovery",
+            "category": "Class",
+            "text": "When a creature uses your Bardic Inspiration die and succeeds on the roll, that creature regains hit points equal to your Proficiency Bonus."
+          },
+          {
+            "name": "Jack of All Trades",
+            "category": "Class",
+            "text": "You add half your Proficiency Bonus, rounded down, to any ability check you make that does not already include your Proficiency Bonus. Expertise. You gain Expertise in two of your skill proficiencies of your choice."
+          },
+          {
+            "name": "Vicious Mockery",
+            "category": "Class",
+            "text": "You learn Vicious Mockery. When a creature fails its saving throw against it, it has Disadvantage on all attack rolls it makes before the end of its next turn."
+          },
+          {
+            "name": "Arcane Growth",
+            "category": "Spell",
+            "text": "Gain 1 random cantrip from your class spell list."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Deepened Magic",
+            "category": "Spell",
+            "text": "Gain 1 random level 1 spell from your class spell list. You also gain 1 max Mana."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Greater Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 2 spell from your class spell list. You also gain 2 max Mana."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Breakthrough Spell",
+            "category": "Spell",
+            "text": "Gain 1 random level 4 spell from your class spell list. You also gain 4 max Mana."
+          }
+        ],
+        "veryRare": [
+          {
+            "name": "High Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 3 spell from your class spell list. You also gain 3 max Mana."
+          }
+        ]
+      }
+    },
+    "Cleric": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Minor Benediction",
+            "category": "Class",
+            "text": "Once per combat, when you heal a creature, it gains +1 to its next saving throw."
+          },
+          {
+            "name": "Arcane Growth",
+            "category": "Spell",
+            "text": "Gain 1 random cantrip from your class spell list."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Deepened Magic",
+            "category": "Spell",
+            "text": "Gain 1 random level 1 spell from your class spell list. You also gain 1 max Mana."
+          },
+          {
+            "name": "Radiant Rebuke",
+            "category": "Class",
+            "text": "Once per combat, when a creature hits you, deal Radiant damage equal to your WIS modifier."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Greater Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 2 spell from your class spell list. You also gain 2 max Mana."
+          },
+          {
+            "name": "Channel Spark",
+            "category": "Class",
+            "text": "Gain one small Channel Divinity-style effect appropriate to your divine path."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Breakthrough Spell",
+            "category": "Spell",
+            "text": "Gain 1 random level 4 spell from your class spell list. You also gain 4 max Mana."
+          },
+          {
+            "name": "Blessed Intervention",
+            "category": "Class",
+            "text": "Once per Long Rest, reroll a failed death saving throw or failed save against a curse."
+          }
+        ],
+        "veryRare": [
+          {
+            "name": "High Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 3 spell from your class spell list. You also gain 3 max Mana."
+          }
+        ]
+      }
+    },
+    "Druid": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Verdant Step",
+            "category": "Class",
+            "text": "Once per combat, ignore difficult terrain until the end of your turn."
+          },
+          {
+            "name": "Arcane Growth",
+            "category": "Spell",
+            "text": "Gain 1 random cantrip from your class spell list."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Deepened Magic",
+            "category": "Spell",
+            "text": "Gain 1 random level 1 spell from your class spell list. You also gain 1 max Mana."
+          },
+          {
+            "name": "Root Snare",
+            "category": "Class",
+            "text": "Once per combat, when you hit with a spell, reduce the target's Speed by 10 ft. until your next turn."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Greater Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 2 spell from your class spell list. You also gain 2 max Mana."
+          },
+          {
+            "name": "Wild Resilience",
+            "category": "Class",
+            "text": "After a Short Rest, gain temporary HP equal to your WIS modifier plus your Proficiency Bonus."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Breakthrough Spell",
+            "category": "Spell",
+            "text": "Gain 1 random level 4 spell from your class spell list. You also gain 4 max Mana."
+          },
+          {
+            "name": "Primal Bloom",
+            "category": "Class",
+            "text": "Once per Long Rest, when you cast a Druid spell, heal yourself or an ally for 1d8 + WIS modifier."
+          }
+        ],
+        "veryRare": [
+          {
+            "name": "High Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 3 spell from your class spell list. You also gain 3 max Mana."
+          }
+        ]
+      }
+    },
+    "Fighter": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Weapon Drill",
+            "category": "Class",
+            "text": "Once per combat, add +1 to an attack roll with a weapon."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Second Wind Surge",
+            "category": "Class",
+            "text": "When you use Second Wind, also gain +1 AC until the start of your next turn."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Tactical Burst",
+            "category": "Class",
+            "text": "Once per Short Rest, move up to half your Speed after making a weapon attack."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Action Spark",
+            "category": "Class",
+            "text": "Once per Long Rest, make one extra weapon attack as part of your Attack action."
+          }
+        ]
+      }
+    },
+    "Monk": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Flowing Step",
+            "category": "Class",
+            "text": "Once per combat, after you make an Unarmed Strike, move 5 ft. without provoking Opportunity Attacks."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Ki Pulse",
+            "category": "Class",
+            "text": "Once per combat, add +1d4 damage to an Unarmed Strike."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Stunning Opening",
+            "category": "Class",
+            "text": "Once per Long Rest, when you hit with an Unarmed Strike, the target has Disadvantage on its next attack roll."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Perfect Motion",
+            "category": "Class",
+            "text": "Once per Long Rest, take the Dodge action as a free action at the start of combat."
+          }
+        ]
+      }
+    },
+    "Paladin": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Oath Spark",
+            "category": "Class",
+            "text": "Once per combat, add +1 Radiant damage to a melee hit."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Half-Caster Initiate",
+            "category": "Spell",
+            "text": "Gain 1 random level 1 Paladin spell. You also gain 1 max Mana."
+          },
+          {
+            "name": "Lay on Hands Surge",
+            "category": "Class",
+            "text": "Your Lay on Hands pool increases by 3 HP."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Lesser Smite",
+            "category": "Class",
+            "text": "Once per Long Rest, when you hit with a melee weapon, deal +1d8 Radiant damage."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Half-Caster Breakthrough",
+            "category": "Spell",
+            "text": "Gain 1 random level 3 Paladin spell. You also gain 3 max Mana."
+          },
+          {
+            "name": "Holy Bulwark",
+            "category": "Class",
+            "text": "Once per Long Rest, you and one nearby ally gain temporary HP equal to your CHA modifier plus your Proficiency Bonus."
+          }
+        ],
+        "veryRare": [
+          {
+            "name": "Half-Caster Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 2 Paladin spell. You also gain 2 max Mana."
+          }
+        ]
+      }
+    },
+    "Ranger": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Marked Step",
+            "category": "Class",
+            "text": "Once per combat, move 5 ft. after damaging a creature marked by you."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Half-Caster Initiate",
+            "category": "Spell",
+            "text": "Gain 1 random level 1 spell from your class spell list. You also gain 1 max Mana."
+          },
+          {
+            "name": "Hunter's Focus",
+            "category": "Class",
+            "text": "Once per combat, add +1d4 damage to a target affected by Hunter's Mark."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Ambusher's Shot",
+            "category": "Class",
+            "text": "On the first round of combat, your first weapon hit deals +1d6 damage."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Half-Caster Breakthrough",
+            "category": "Spell",
+            "text": "Gain 1 random level 3 spell from your class spell list. You also gain 3 max Mana."
+          },
+          {
+            "name": "Perfect Quarry",
+            "category": "Class",
+            "text": "Once per Long Rest, when you hit your marked target, make one additional weapon attack against it."
+          }
+        ],
+        "veryRare": [
+          {
+            "name": "Half-Caster Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 2 spell from your class spell list. You also gain 2 max Mana."
+          }
+        ]
+      }
+    },
+    "Rogue": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Quick Fingers",
+            "category": "Class",
+            "text": "Once per combat, gain Advantage on a DEX check or Thieves' Tools check."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Sneak Edge",
+            "category": "Class",
+            "text": "Once per combat, add +1 damage to your Sneak Attack."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Vanish Step",
+            "category": "Class",
+            "text": "Once per Short Rest, take the Hide action as a bonus action even in light obscurement."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Killer Instinct",
+            "category": "Class",
+            "text": "Once per Long Rest, when Sneak Attack deals damage, reroll all 1s on its damage dice."
+          }
+        ]
+      }
+    },
+    "Sorcerer": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Raw Spark",
+            "category": "Class",
+            "text": "Once per combat, add +1 damage to a Sorcerer spell."
+          },
+          {
+            "name": "Arcane Growth",
+            "category": "Spell",
+            "text": "Gain 1 random cantrip from your class spell list."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Deepened Magic",
+            "category": "Spell",
+            "text": "Gain 1 random level 1 spell from your class spell list. You also gain 1 max Mana."
+          },
+          {
+            "name": "Innate Surge",
+            "category": "Class",
+            "text": "When you use Innate Sorcery, gain temporary HP equal to your CHA modifier."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Greater Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 2 spell from your class spell list. You also gain 2 max Mana."
+          },
+          {
+            "name": "Metamagic Seed",
+            "category": "Class",
+            "text": "Gain a small metamagic-style modification usable once per Long Rest."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Breakthrough Spell",
+            "category": "Spell",
+            "text": "Gain 1 random level 4 spell from your class spell list. You also gain 4 max Mana."
+          },
+          {
+            "name": "Arcane Overflow",
+            "category": "Class",
+            "text": "Once per Long Rest, after casting a Sorcerer spell, cast a cantrip as a bonus action."
+          }
+        ],
+        "veryRare": [
+          {
+            "name": "High Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 3 spell from your class spell list. You also gain 3 max Mana."
+          }
+        ]
+      }
+    },
+    "Warlock": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Pact Ember",
+            "category": "Class",
+            "text": "Once per combat, add +1 damage to a Warlock spell or pact attack."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Invocation Flicker",
+            "category": "Class",
+            "text": "Gain one minor invocation-style benefit until your next Long Rest."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Patron's Glare",
+            "category": "Class",
+            "text": "Once per Long Rest, impose Disadvantage on a creature's save against one of your Warlock spells."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Pact Reversal",
+            "category": "Class",
+            "text": "Once per Long Rest, when you drop to 0 HP, remain at 1 HP and deal Necrotic damage to a nearby enemy."
+          }
+        ]
+      }
+    },
+    "Wizard": {
+      "floor1": {
+        "common": [
+          {
+            "name": "Prepared Trick",
+            "category": "Class",
+            "text": "Once per combat, gain +1 to a spell attack roll or spell save DC for one Wizard cantrip."
+          },
+          {
+            "name": "Arcane Growth",
+            "category": "Spell",
+            "text": "Gain 1 random cantrip from your class spell list."
+          }
+        ],
+        "uncommon": [
+          {
+            "name": "Deepened Magic",
+            "category": "Spell",
+            "text": "Gain 1 random level 1 spell from your class spell list. You also gain 1 max Mana."
+          },
+          {
+            "name": "Arcane Note",
+            "category": "Class",
+            "text": "Add one extra first-level Wizard spell to your spellbook."
+          }
+        ],
+        "rare": [
+          {
+            "name": "Greater Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 2 spell from your class spell list. You also gain 2 max Mana."
+          },
+          {
+            "name": "Efficient Recovery",
+            "category": "Class",
+            "text": "When you use Arcane Recovery, regain 1 additional Mana once per Long Rest."
+          }
+        ],
+        "legendary": [
+          {
+            "name": "Breakthrough Spell",
+            "category": "Spell",
+            "text": "Gain 1 random level 4 spell from your class spell list. You also gain 4 max Mana."
+          },
+          {
+            "name": "Spellbook Flash",
+            "category": "Class",
+            "text": "Once per Long Rest, cast a prepared first-level Wizard spell without spending Mana."
+          }
+        ],
+        "veryRare": [
+          {
+            "name": "High Spellcraft",
+            "category": "Spell",
+            "text": "Gain 1 random level 3 spell from your class spell list. You also gain 3 max Mana."
+          }
+        ]
+      }
+    }
+  }
+}

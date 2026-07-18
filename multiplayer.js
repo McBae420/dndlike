@@ -1,0 +1,642 @@
+(() => {
+  const config = window.AVTIZM_SUPABASE_CONFIG;
+  const supabaseFactory = window.supabase?.createClient;
+  const mode = document.body.dataset.vttView === "player" ? "player" : "dm";
+  const sessionStorageKey = `avtizm4.multiplayer.${mode}`;
+  const characterStorageKey = "avtizm4.character";
+  const playerStateStorageKey = "avtizm4.vtt.player";
+
+  const state = {
+    available: Boolean(config?.url && config?.publishableKey && supabaseFactory),
+    connected: false,
+    busy: false,
+    error: "",
+    userId: null,
+    campaignId: null,
+    campaignName: "",
+    joinCode: "",
+    role: mode,
+    tokenId: null,
+    displayName: "",
+    members: [],
+    client: null,
+    channel: null,
+  };
+
+  let barElement = null;
+  let resolveReady;
+  const ready = new Promise((resolve) => {
+    resolveReady = resolve;
+  });
+
+  function loadJson(key, fallback) {
+    try {
+      return JSON.parse(localStorage.getItem(key)) ?? fallback;
+    } catch (error) {
+      console.warn(error);
+      return fallback;
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function reportError(context, error) {
+    console.warn(
+      `${context}: ${error?.message || String(error)}`,
+      error?.code || "",
+      error?.details || "",
+    );
+  }
+
+  function emit(name, detail = {}) {
+    window.dispatchEvent(new CustomEvent(`avtizm-multiplayer:${name}`, {
+      detail: { ...detail, multiplayer: api },
+    }));
+  }
+
+  function characterDisplayName() {
+    const character = loadJson(characterStorageKey, null);
+    const race = character?.race?.name;
+    const characterClass = character?.class?.name;
+    return [race, characterClass].filter(Boolean).join(" ") || "Player";
+  }
+
+  function setBusy(busy, error = "") {
+    state.busy = busy;
+    state.error = error;
+    renderBar();
+  }
+
+  function persistSession() {
+    if (!state.connected) {
+      localStorage.removeItem(sessionStorageKey);
+      return;
+    }
+    localStorage.setItem(sessionStorageKey, JSON.stringify({
+      campaignId: state.campaignId,
+      role: state.role,
+      tokenId: state.tokenId,
+      displayName: state.displayName,
+    }));
+  }
+
+  function createBar() {
+    barElement = document.createElement("section");
+    barElement.className = "multiplayer-bar";
+    barElement.setAttribute("aria-label", "Multiplayer connection");
+    const header = document.querySelector(".dungeon-header");
+    header?.insertAdjacentElement("afterend", barElement);
+    renderBar();
+  }
+
+  function disconnectedMarkup() {
+    if (!state.available) {
+      return `
+        <div class="multiplayer-summary">
+          <span class="connection-dot is-offline"></span>
+          <div>
+            <strong>Multiplayer unavailable</strong>
+            <small>Supabase configuration or client library is missing.</small>
+          </div>
+        </div>
+      `;
+    }
+
+    if (mode === "dm") {
+      return `
+        <form class="multiplayer-form" data-create-campaign>
+          <div class="multiplayer-summary">
+            <span class="connection-dot is-offline"></span>
+            <div>
+              <strong>Start an online campaign</strong>
+              <small>Create a code for players to join.</small>
+            </div>
+          </div>
+          <label>
+            Campaign
+            <input name="campaignName" maxlength="80" value="D&amp;D Roguelike" required />
+          </label>
+          <label>
+            DM name
+            <input name="displayName" maxlength="50" value="Dungeon Master" required />
+          </label>
+          <button type="submit" ${state.busy ? "disabled" : ""}>
+            ${state.busy ? "Connecting…" : "Create Game"}
+          </button>
+        </form>
+      `;
+    }
+
+    return `
+      <form class="multiplayer-form" data-join-campaign>
+        <div class="multiplayer-summary">
+          <span class="connection-dot is-offline"></span>
+          <div>
+            <strong>Join an online campaign</strong>
+            <small>Enter the six-character code from your DM.</small>
+          </div>
+        </div>
+        <label>
+          Game code
+          <input name="joinCode" class="join-code-input" maxlength="6" autocomplete="off" required />
+        </label>
+        <label>
+          Player name
+          <input name="displayName" maxlength="50" value="${escapeHtml(characterDisplayName())}" required />
+        </label>
+        <button type="submit" ${state.busy ? "disabled" : ""}>
+          ${state.busy ? "Joining…" : "Join Game"}
+        </button>
+      </form>
+    `;
+  }
+
+  function connectedMarkup() {
+    const players = state.members.filter((member) => member.role === "player");
+    const playerList = mode === "dm"
+      ? `
+        <div class="multiplayer-members" aria-label="Connected players">
+          ${players.map((member) => `
+            <span class="multiplayer-member">
+              ${escapeHtml(member.display_name)}
+            </span>
+          `).join("") || "<small>Waiting for players…</small>"}
+        </div>
+      `
+      : "";
+
+    return `
+      <div class="multiplayer-connected">
+        <div class="multiplayer-summary">
+          <span class="connection-dot is-online"></span>
+          <div>
+            <strong>${escapeHtml(state.campaignName || "Online campaign")}</strong>
+            <small>${mode === "dm" ? "DM view" : `Playing as ${escapeHtml(state.displayName)}`}</small>
+          </div>
+        </div>
+        <button class="join-code-copy" type="button" data-copy-code title="Copy game code">
+          <span>Game code</span>
+          <strong>${escapeHtml(state.joinCode)}</strong>
+        </button>
+        ${playerList}
+        <button class="secondary-button" type="button" data-disconnect>Leave</button>
+      </div>
+    `;
+  }
+
+  function renderBar() {
+    if (!barElement) return;
+    barElement.innerHTML = `
+      ${state.connected ? connectedMarkup() : disconnectedMarkup()}
+      ${state.error ? `<p class="multiplayer-error" role="alert">${escapeHtml(state.error)}</p>` : ""}
+    `;
+
+    barElement.querySelector("[data-create-campaign]")?.addEventListener("submit", handleCreate);
+    barElement.querySelector("[data-join-campaign]")?.addEventListener("submit", handleJoin);
+    barElement.querySelector("[data-disconnect]")?.addEventListener("click", disconnect);
+    barElement.querySelector("[data-copy-code]")?.addEventListener("click", async () => {
+      await navigator.clipboard?.writeText(state.joinCode);
+      const label = barElement.querySelector("[data-copy-code] span");
+      if (label) {
+        label.textContent = "Copied";
+        window.setTimeout(() => {
+          if (label) label.textContent = "Game code";
+        }, 1200);
+      }
+    });
+  }
+
+  async function ensureUser() {
+    const { data: sessionData, error: sessionError } = await state.client.auth.getSession();
+    if (sessionError) throw sessionError;
+    let session = sessionData.session;
+    if (!session) {
+      const { data, error } = await state.client.auth.signInAnonymously();
+      if (error) throw error;
+      session = data.session;
+    }
+    state.userId = session?.user?.id || null;
+    if (!state.userId) throw new Error("Could not create a multiplayer identity.");
+  }
+
+  async function handleCreate(event) {
+    event.preventDefault();
+    if (state.busy) return;
+    const form = new FormData(event.currentTarget);
+    setBusy(true);
+    const { data, error } = await state.client.rpc("create_campaign", {
+      p_name: String(form.get("campaignName") || "").trim(),
+      p_display_name: String(form.get("displayName") || "").trim(),
+    });
+    if (error) {
+      setBusy(false, error.message);
+      return;
+    }
+    const result = data?.[0];
+    await connectToCampaign({
+      campaignId: result.campaign_id,
+      role: result.member_role,
+      tokenId: result.token_id,
+      displayName: String(form.get("displayName") || "").trim(),
+    });
+    setBusy(false);
+  }
+
+  async function handleJoin(event) {
+    event.preventDefault();
+    if (state.busy) return;
+    const form = new FormData(event.currentTarget);
+    const code = String(form.get("joinCode") || "").trim().toUpperCase();
+    const displayName = String(form.get("displayName") || "").trim();
+    setBusy(true);
+    const { data, error } = await state.client.rpc("join_campaign", {
+      p_code: code,
+      p_display_name: displayName,
+      p_character: loadJson(characterStorageKey, {}),
+      p_player_state: loadJson(playerStateStorageKey, {}),
+    });
+    if (error) {
+      setBusy(false, error.message);
+      return;
+    }
+    const result = data?.[0];
+    await connectToCampaign({
+      campaignId: result.campaign_id,
+      role: result.member_role,
+      tokenId: result.token_id,
+      displayName,
+    });
+    setBusy(false);
+  }
+
+  async function restoreCampaign() {
+    const saved = loadJson(sessionStorageKey, null);
+    if (!saved?.campaignId) return;
+    const { data: member, error: memberError } = await state.client
+      .from("campaign_members")
+      .select("campaign_id,user_id,role,display_name,token_id")
+      .eq("campaign_id", saved.campaignId)
+      .eq("user_id", state.userId)
+      .maybeSingle();
+    if (memberError || !member || member.role !== mode) {
+      localStorage.removeItem(sessionStorageKey);
+      return;
+    }
+    await connectToCampaign({
+      campaignId: member.campaign_id,
+      role: member.role,
+      tokenId: member.token_id,
+      displayName: member.display_name,
+    });
+  }
+
+  async function connectToCampaign(session) {
+    state.campaignId = session.campaignId;
+    state.role = session.role;
+    state.tokenId = session.tokenId;
+    state.displayName = session.displayName;
+
+    const { data: campaign, error } = await state.client
+      .from("campaigns")
+      .select("id,name,join_code,active")
+      .eq("id", state.campaignId)
+      .single();
+    if (error) throw error;
+
+    state.campaignName = campaign.name;
+    state.joinCode = campaign.join_code;
+    state.connected = true;
+    persistSession();
+    await refreshMembers();
+    await subscribeToCampaign();
+    await loadInitialState();
+    renderBar();
+    emit("connected", getState());
+  }
+
+  async function refreshMembers() {
+    if (!state.connected) return [];
+    const { data: members, error } = await state.client
+      .from("campaign_members")
+      .select("campaign_id,user_id,role,display_name,token_id,joined_at,last_seen")
+      .eq("campaign_id", state.campaignId)
+      .order("joined_at");
+    if (error) {
+      reportError("Could not refresh campaign members", error);
+      return state.members;
+    }
+
+    let characterRows = [];
+    if (mode === "dm") {
+      const response = await state.client
+        .from("player_characters")
+        .select("campaign_id,user_id,character,player_state,updated_at")
+        .eq("campaign_id", state.campaignId);
+      if (!response.error) characterRows = response.data || [];
+    } else {
+      const response = await state.client
+        .from("player_characters")
+        .select("campaign_id,user_id,character,player_state,updated_at")
+        .eq("campaign_id", state.campaignId)
+        .eq("user_id", state.userId)
+        .maybeSingle();
+      if (response.data) {
+        characterRows = [response.data];
+        restoreOwnCharacter(response.data);
+      }
+    }
+
+    const charactersByUser = new Map(characterRows.map((row) => [row.user_id, row]));
+    state.members = (members || []).map((member) => ({
+      ...member,
+      character: charactersByUser.get(member.user_id)?.character || null,
+      player_state: charactersByUser.get(member.user_id)?.player_state || null,
+    }));
+    renderBar();
+    emit("members-changed", { members: state.members });
+    return state.members;
+  }
+
+  function restoreOwnCharacter(row) {
+    if (!row?.character || Object.keys(row.character).length === 0) return;
+    const localCharacter = loadJson(characterStorageKey, null);
+    const localTime = Date.parse(localCharacter?.savedAt || 0) || 0;
+    const remoteTime = Date.parse(row.character?.savedAt || row.updated_at || 0) || 0;
+    if (!localCharacter || remoteTime > localTime) {
+      localStorage.setItem(characterStorageKey, JSON.stringify(row.character));
+    }
+    if (row.player_state && Object.keys(row.player_state).length > 0) {
+      const localState = loadJson(playerStateStorageKey, {});
+      if (Object.keys(localState).length === 0) {
+        localStorage.setItem(playerStateStorageKey, JSON.stringify(row.player_state));
+      }
+    }
+  }
+
+  async function subscribeToCampaign() {
+    if (state.channel) await state.client.removeChannel(state.channel);
+    state.channel = state.client
+      .channel(`campaign:${state.campaignId}:${mode}:${state.userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "campaign_members",
+          filter: `campaign_id=eq.${state.campaignId}`,
+        },
+        () => refreshMembers(),
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "player_characters",
+          filter: `campaign_id=eq.${state.campaignId}`,
+        },
+        () => refreshMembers(),
+      );
+
+    if (mode === "dm") {
+      state.channel.on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "player_actions",
+          filter: `campaign_id=eq.${state.campaignId}`,
+        },
+        (payload) => emit("game-action", { action: payload.new }),
+      );
+    } else {
+      state.channel.on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "player_views",
+          filter: `user_id=eq.${state.userId}`,
+        },
+        (payload) => {
+          if (payload.new?.campaign_id === state.campaignId) {
+            emit("dungeon-state", {
+              state: payload.new.dungeon_state,
+              revision: payload.new.revision,
+            });
+          }
+        },
+      );
+    }
+
+    state.channel.subscribe((status) => {
+      if (status === "CHANNEL_ERROR") {
+        state.error = "Realtime connection interrupted. Reconnecting…";
+        renderBar();
+      }
+      if (status === "SUBSCRIBED" && state.error.includes("Realtime")) {
+        state.error = "";
+        renderBar();
+      }
+    });
+  }
+
+  async function loadInitialState() {
+    if (mode === "dm") {
+      const { data } = await state.client
+        .from("campaign_dm_state")
+        .select("dungeon_state,revision")
+        .eq("campaign_id", state.campaignId)
+        .maybeSingle();
+      if (data?.dungeon_state) {
+        emit("dungeon-state", {
+          state: data.dungeon_state,
+          revision: data.revision,
+        });
+      }
+      const { data: pending } = await state.client
+        .from("player_actions")
+        .select("*")
+        .eq("campaign_id", state.campaignId)
+        .eq("status", "pending")
+        .order("created_at");
+      (pending || []).forEach((action) => emit("game-action", { action }));
+      return;
+    }
+
+    const { data } = await state.client
+      .from("player_views")
+      .select("dungeon_state,revision")
+      .eq("campaign_id", state.campaignId)
+      .eq("user_id", state.userId)
+      .maybeSingle();
+    if (data?.dungeon_state) {
+      emit("dungeon-state", {
+        state: data.dungeon_state,
+        revision: data.revision,
+      });
+    }
+  }
+
+  async function disconnect() {
+    if (state.channel) {
+      await state.client.removeChannel(state.channel);
+      state.channel = null;
+    }
+    state.connected = false;
+    state.campaignId = null;
+    state.campaignName = "";
+    state.joinCode = "";
+    state.tokenId = null;
+    state.members = [];
+    state.error = "";
+    persistSession();
+    renderBar();
+    emit("disconnected", {});
+  }
+
+  async function syncCharacter(character, playerState) {
+    if (!state.connected || mode !== "player") return;
+    const { error } = await state.client
+      .from("player_characters")
+      .upsert({
+        campaign_id: state.campaignId,
+        user_id: state.userId,
+        character: character || {},
+        player_state: playerState || {},
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "campaign_id,user_id" });
+    if (error) reportError("Could not sync player character", error);
+  }
+
+  async function saveDmState(dungeonState) {
+    if (!state.connected || mode !== "dm" || !dungeonState) return;
+    const { data: current } = await state.client
+      .from("campaign_dm_state")
+      .select("revision")
+      .eq("campaign_id", state.campaignId)
+      .maybeSingle();
+    const { error } = await state.client
+      .from("campaign_dm_state")
+      .upsert({
+        campaign_id: state.campaignId,
+        dungeon_state: dungeonState,
+        revision: Number(current?.revision || 0) + 1,
+        updated_at: new Date().toISOString(),
+        updated_by: state.userId,
+      }, { onConflict: "campaign_id" });
+    if (error) reportError("Could not save DM dungeon state", error);
+  }
+
+  async function savePlayerViews(views) {
+    if (!state.connected || mode !== "dm" || !Array.isArray(views) || views.length === 0) return;
+    const rows = views.map((view) => ({
+      campaign_id: state.campaignId,
+      user_id: view.userId,
+      dungeon_state: view.dungeonState,
+      revision: Date.now(),
+      updated_at: new Date().toISOString(),
+    }));
+    const { error } = await state.client
+      .from("player_views")
+      .upsert(rows, { onConflict: "campaign_id,user_id" });
+    if (error) reportError("Could not save player views", error);
+  }
+
+  async function submitAction(actionType, payload) {
+    if (!state.connected || mode !== "player") return null;
+    const { data, error } = await state.client
+      .from("player_actions")
+      .insert({
+        campaign_id: state.campaignId,
+        user_id: state.userId,
+        action_type: actionType,
+        payload: payload || {},
+      })
+      .select("id")
+      .single();
+    if (error) {
+      state.error = error.message;
+      renderBar();
+      return null;
+    }
+    return data.id;
+  }
+
+  async function completeAction(actionId, accepted, result = {}) {
+    if (!state.connected || mode !== "dm") return;
+    const { error } = await state.client
+      .from("player_actions")
+      .update({
+        status: accepted ? "accepted" : "rejected",
+        result,
+        processed_at: new Date().toISOString(),
+      })
+      .eq("id", actionId)
+      .eq("campaign_id", state.campaignId);
+    if (error) reportError("Could not complete player action", error);
+  }
+
+  function getState() {
+    return {
+      available: state.available,
+      connected: state.connected,
+      userId: state.userId,
+      campaignId: state.campaignId,
+      campaignName: state.campaignName,
+      joinCode: state.joinCode,
+      role: state.role,
+      tokenId: state.tokenId,
+      displayName: state.displayName,
+      members: state.members,
+    };
+  }
+
+  const api = {
+    ready,
+    getState,
+    refreshMembers,
+    syncCharacter,
+    saveDmState,
+    savePlayerViews,
+    submitAction,
+    completeAction,
+  };
+  window.avtizmMultiplayer = api;
+
+  async function initialize() {
+    createBar();
+    if (!state.available) {
+      resolveReady(api);
+      return;
+    }
+    try {
+      state.client = supabaseFactory(config.url, config.publishableKey, {
+        auth: {
+          storageKey: `avtizm4.auth.${mode}`,
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false,
+        },
+      });
+      await ensureUser();
+      await restoreCampaign();
+    } catch (error) {
+      state.error = error.message || "Could not initialize multiplayer.";
+      reportError("Could not initialize multiplayer", error);
+      renderBar();
+    } finally {
+      resolveReady(api);
+      emit("ready", getState());
+    }
+  }
+
+  initialize();
+})();

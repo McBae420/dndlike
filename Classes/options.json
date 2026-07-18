@@ -1,0 +1,91 @@
+{
+  "Fighter": [
+    {
+      "name": "Archery",
+      "features": [
+        "Archery: You gain a +2 bonus to attack rolls you make with Ranged weapons."
+      ]
+    },
+    {
+      "name": "Blind Fighting",
+      "features": [
+        "Blind Fighting: You have Blindsight with a range of 10 feet."
+      ]
+    },
+    {
+      "name": "Dueling",
+      "features": [
+        "Dueling: When you're holding a Melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon."
+      ]
+    },
+    {
+      "name": "Great Weapon Fighting",
+      "features": [
+        "Great Weapon Fighting: When you roll damage for an attack with a Melee weapon you are holding with two hands, treat any 1 or 2 on a damage die as a 3. The weapon must have the Two-Handed or Versatile property."
+      ]
+    },
+    {
+      "name": "Interception",
+      "features": [
+        "Interception: When a creature you can see hits another creature within 5 feet of you with an attack roll, take a Reaction to reduce the damage by 1d10 plus your Proficiency Bonus. You must be holding a Shield or a Simple or Martial weapon."
+      ]
+    },
+    {
+      "name": "Protection",
+      "features": [
+        "Protection: When a creature you can see attacks a target other than you within 5 feet of you, take a Reaction to interpose your Shield if you're holding one. Impose Disadvantage on that attack roll and all other attack rolls against the target until the start of your next turn if you remain within 5 feet."
+      ]
+    },
+    {
+      "name": "Thrown Weapon Fighting",
+      "features": [
+        "Thrown Weapon Fighting: When you hit with a ranged attack roll using a weapon with the Thrown property, gain a +2 bonus to the damage roll."
+      ]
+    },
+    {
+      "name": "Two Weapon Fighting",
+      "features": [
+        "Two Weapon Fighting: When you make an extra attack from using a weapon with the Light property, you can add your ability modifier to that attack's damage if you aren't already adding it."
+      ]
+    },
+    {
+      "name": "Unarmed Fighting",
+      "features": [
+        "Unarmed Fighting: When your Unarmed Strike deals damage, it can deal 1d6 + STR modifier Bludgeoning damage instead of normal damage. If you aren't holding weapons or a Shield, the d6 becomes a d8.",
+        "Grapple Damage: At the start of each of your turns, deal 1d4 Bludgeoning damage to one creature Grappled by you."
+      ]
+    }
+  ],
+  "Cleric": [
+    {
+      "name": "Protector",
+      "features": [
+        "Divine Order: Protector",
+        "Protector: Gain Martial weapons and Heavy armor."
+      ]
+    },
+    {
+      "name": "Thaumaturge",
+      "features": [
+        "Divine Order: Thaumaturge",
+        "Thaumaturge: Know 1 extra Cleric cantrip. Add your WIS modifier, minimum +1, to Arcana or Religion checks."
+      ]
+    }
+  ],
+  "Druid": [
+    {
+      "name": "Magician",
+      "features": [
+        "Primal Order: Magician",
+        "Magician: Know 1 extra Druid cantrip. Add your WIS modifier, minimum +1, to INT Arcana or Nature checks."
+      ]
+    },
+    {
+      "name": "Warden",
+      "features": [
+        "Primal Order: Warden",
+        "Warden: Gain Martial weapons and Medium armor."
+      ]
+    }
+  ]
+}

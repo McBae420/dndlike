@@ -1,0 +1,185 @@
+{
+  "Dragonborn": [
+    {
+      "name": "Black Dragon",
+      "features": [
+        "Draconic Ancestry: Black dragon.",
+        "Damage Type: Acid"
+      ]
+    },
+    {
+      "name": "Blue Dragon",
+      "features": [
+        "Draconic Ancestry: Blue dragon.",
+        "Damage Type: Lightning"
+      ]
+    },
+    {
+      "name": "Brass Dragon",
+      "features": [
+        "Draconic Ancestry: Brass dragon.",
+        "Damage Type: Fire"
+      ]
+    },
+    {
+      "name": "Bronze Dragon",
+      "features": [
+        "Draconic Ancestry: Bronze dragon.",
+        "Damage Type: Lightning"
+      ]
+    },
+    {
+      "name": "Copper Dragon",
+      "features": [
+        "Draconic Ancestry: Copper dragon.",
+        "Damage Type: Acid"
+      ]
+    },
+    {
+      "name": "Gold Dragon",
+      "features": [
+        "Draconic Ancestry: Gold dragon.",
+        "Damage Type: Fire"
+      ]
+    },
+    {
+      "name": "Green Dragon",
+      "features": [
+        "Draconic Ancestry: Green dragon.",
+        "Damage Type: Poison"
+      ]
+    },
+    {
+      "name": "Red Dragon",
+      "features": [
+        "Draconic Ancestry: Red dragon.",
+        "Damage Type: Fire"
+      ]
+    },
+    {
+      "name": "Silver Dragon",
+      "features": [
+        "Draconic Ancestry: Silver dragon.",
+        "Damage Type: Cold"
+      ]
+    },
+    {
+      "name": "White Dragon",
+      "features": [
+        "Draconic Ancestry: White dragon.",
+        "Damage Type: Cold"
+      ]
+    }
+  ],
+  "Elf": [
+    {
+      "name": "Drow",
+      "features": [
+        "Drow Lineage: Your Darkvision increases to 120 ft. You know the Dancing Lights cantrip."
+      ]
+    },
+    {
+      "name": "High Elf",
+      "features": [
+        "High Elf Lineage: You know the Prestidigitation cantrip. When you finish a Long Rest, you can replace it with a different Wizard cantrip."
+      ]
+    },
+    {
+      "name": "Wood Elf",
+      "features": [
+        "Wood Elf Lineage: Your Speed increases to 35 ft. You know the Druidcraft cantrip."
+      ]
+    },
+    {
+      "name": "Lorwyn Elf",
+      "features": [
+        "Lorwyn Elf Lineage: You know the Thorn Whip cantrip. When you finish a Long Rest, you can replace it with a different Druid cantrip."
+      ]
+    },
+    {
+      "name": "Shadowmoor Elf",
+      "features": [
+        "Shadowmoor Elf Lineage: Your Darkvision increases to 120 ft. You know the Starry Wisp cantrip."
+      ]
+    }
+  ],
+  "Gnome": [
+    {
+      "name": "Forest Gnome",
+      "features": [
+        "Forest Gnome Lineage: You know the Minor Illusion cantrip. You also always have Speak with Animals prepared. You can cast it without spending Mana a number of times equal to your Proficiency Bonus. Regain all uses on a Long Rest."
+      ]
+    },
+    {
+      "name": "Rock Gnome",
+      "features": [
+        "Rock Gnome Lineage: You know the Mending and Prestidigitation cantrips.",
+        "Clockwork Device: Spend 10 minutes casting Prestidigitation to create a Tiny clockwork device, such as a toy, fire starter, or music box. It produces one Prestidigitation effect when activated as a bonus action. You can have up to 3 devices at once. They last 8 hours."
+      ]
+    }
+  ],
+  "Goliath": [
+    {
+      "name": "Cloud Giant",
+      "features": [
+        "Cloud’s Jaunt: As a bonus action, you teleport up to 30 ft. to an empty space you can see.",
+        "Uses: You can use this a number of times equal to your Proficiency Bonus. You regain all uses on a Long Rest."
+      ]
+    },
+    {
+      "name": "Fire Giant",
+      "features": [
+        "Fire’s Burn: When you hit a creature with an attack, you can deal an extra 1d10 Fire damage.",
+        "Uses: You can use this a number of times equal to your Proficiency Bonus. You regain all uses on a Long Rest."
+      ]
+    },
+    {
+      "name": "Frost Giant",
+      "features": [
+        "Frost’s Chill: When you hit a creature with an attack, you can deal an extra 1d6 Cold damage and reduce its Speed by 10 ft. until the start of your next turn.",
+        "Uses: You can use this a number of times equal to your Proficiency Bonus. You regain all uses on a Long Rest."
+      ]
+    },
+    {
+      "name": "Hill Giant",
+      "features": [
+        "Hill’s Tumble: When you hit a Large or smaller creature with an attack, you can knock it Prone.",
+        "Uses: You can use this a number of times equal to your Proficiency Bonus. You regain all uses on a Long Rest."
+      ]
+    },
+    {
+      "name": "Stone Giant",
+      "features": [
+        "Stone’s Endurance: When you take damage, you can use your reaction to reduce it by 1d12 + your CON modifier.",
+        "Uses: You can use this a number of times equal to your Proficiency Bonus. You regain all uses on a Long Rest."
+      ]
+    },
+    {
+      "name": "Storm Giant",
+      "features": [
+        "Storm’s Thunder: When a creature within 60 ft. damages you, you can use your reaction to deal 1d8 Thunder damage to it.",
+        "Uses: You can use this a number of times equal to your Proficiency Bonus. You regain all uses on a Long Rest."
+      ]
+    }
+  ],
+  "Tiefling": [
+    {
+      "name": "Abyssal",
+      "features": [
+        "Abyssal Gift: You have resistance to Poison damage. You also know the Poison Spray cantrip."
+      ]
+    },
+    {
+      "name": "Chthonic",
+      "features": [
+        "Chthonic Gift: You have resistance to Necrotic damage. You also know the Chill Touch cantrip."
+      ]
+    },
+    {
+      "name": "Infernal",
+      "features": [
+        "Infernal Gift: You have resistance to Fire damage. You also know the Fire Bolt cantrip."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "Alert": [
+    "Initiative Proficiency: When you roll Initiative, you can add your Proficiency Bonus to the roll.",
+    "Initiative Swap: Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You can't make this swap if you or the ally has the Incapacitated condition."
+  ],
+  "Healer": [
+    "Battle Medic: If you have a Healer's Kit, you can expend one use of it and tend to a creature within 5 feet of yourself as a Utilize action. That creature can expend one of its Hit Point Dice, and you then roll that die. The creature regains HP equal to the roll plus your Proficiency Bonus.",
+    "Healing Rerolls: Whenever you roll a die to determine the number of HP you restore with a spell or Battle Medic, you can reroll the die if it rolls a 1, and you must use the new roll."
+  ],
+  "Lucky": [
+    "Luck Points: You have Luck Points equal to your Proficiency Bonus. You regain expended Luck Points when you finish a Long Rest.",
+    "Advantage: When you roll a d20 for a D20 Test, spend 1 Luck Point to give yourself Advantage.",
+    "Disadvantage: When a creature rolls a d20 for an attack roll against you, spend 1 Luck Point to impose Disadvantage."
+  ],
+  "Magic Initiate": [
+    "Two Cantrips: Learn two cantrips from the Cleric, Druid, or Wizard spell list. Choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "Level 1 Spell: Choose a level 1 spell from the same list. You always have it prepared and can cast it once without spending Mana per Long Rest.",
+    "Spell Change: Whenever you gain a level, replace one chosen spell with another spell of the same level from the chosen list.",
+    "Repeatable: You can take this feat more than once, but must choose a different spell list each time."
+  ],
+  "Musician": [
+    "Instrument Training: Gain proficiency with three Musical Instruments of your choice.",
+    "Encouraging Song: As you finish a Short or Long Rest, play a proficient Musical Instrument and give Heroic Inspiration to allies who hear it. The number of allies equals your Proficiency Bonus."
+  ],
+  "Savage Attacker": [
+    "Savage Attacker: Once per turn when you hit a target with a weapon, you can roll the weapon's damage dice twice and use either roll."
+  ],
+  "Sharp Eye": [
+    "Sharp Eye: When you take the Search or Study action, give yourself Advantage on an ability check made as part of that action.",
+    "Uses: You can use this a number of times equal to your Proficiency Bonus. Regain all expended uses on a Long Rest. If the check fails, the use isn't expended."
+  ],
+  "Skilled": [
+    "Skilled: Gain proficiency in any combination of three skills or tools of your choice.",
+    "Repeatable: You can take this feat more than once."
+  ],
+  "Survivor": [
+    "Hypervigilance: Whenever you roll Initiative, reroll the d20 if the number rolled is 9 or lower. You must use the new roll.",
+    "Steel Yourself: When you fail a saving throw to avoid or end Charmed or Frightened, take a Reaction to add your Proficiency Bonus to the roll, potentially causing it to succeed. Use once per Long Rest."
+  ],
+  "Tavern Brawler": [
+    "Enhanced Unarmed Strike: When your Unarmed Strike deals damage, deal Bludgeoning damage equal to 1d4 plus your Strength modifier instead of normal Unarmed Strike damage.",
+    "Damage Rerolls: Whenever you roll a damage die for your Unarmed Strike, reroll the die if it rolls a 1, and use the new roll.",
+    "Improvised Weaponry: You have proficiency with improvised weapons.",
+    "Push: Once per turn when you hit with an Unarmed Strike as part of the Attack action, deal damage and push the target 5 feet away."
+  ],
+  "Tough": [
+    "Tough: Your HP maximum increases by twice your character level when you gain this feat. Whenever you gain a level thereafter, your HP maximum increases by 2 more."
+  ]
+}

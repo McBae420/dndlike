@@ -1,0 +1,76 @@
+{
+  "Aasimar": [
+    "Size: Medium",
+    "Speed: 30 ft.",
+    "Celestial Resistance: You have resistance to Necrotic and Radiant damage.",
+    "Darkvision: You have Darkvision 60 ft.",
+    "Healing Hands: As a Magic action, touch a creature and roll d4s equal to your Proficiency Bonus. The creature regains HP equal to the total. Use once per Long Rest.",
+    "Light Bearer: You know the Light cantrip. Charisma is your spellcasting ability for it."
+  ],
+  "Dragonborn": [
+    "Size: Medium",
+    "Speed: 30 ft.",
+    "Draconic Ancestry: Choose one damage type. You have resistance to that damage type.",
+    "Breath Weapon: When you take the Attack action, you can replace one attack with magical breath in a 15-ft. cone or a 30-ft. line that is 5 ft. wide. Each creature in the area makes a DEX save: DC = 8 + CON mod + PB. On a failure, it takes 1d10 damage of your chosen type, or half as much on a success.",
+    "You can use Breath Weapon a number of times equal to your Proficiency Bonus. Regain all uses on a Long Rest."
+  ],
+  "Dwarf": [
+    "Size: Medium",
+    "Speed: 30 ft.",
+    "Darkvision: You have Darkvision 120 ft.",
+    "Dwarven Resilience: You have resistance to Poison damage and advantage on saves to avoid or end the Poisoned condition.",
+    "Dwarven Toughness: Your maximum HP increases by 1.",
+    "Stonecunning: As a bonus action, gain Tremorsense 60 ft. for 10 minutes. You must be on or touching stone. Uses equal your Proficiency Bonus. Regain all uses on a Long Rest."
+  ],
+  "Elf": [
+    "Size: Medium",
+    "Speed: 30 ft.",
+    "Darkvision: You have Darkvision 60 ft.",
+    "Elven Lineage: Choose one Elf lineage.",
+    "Fey Ancestry: You have advantage on saves to avoid or end the Charmed condition.",
+    "Keen Senses: Gain proficiency in Insight, Perception, or Survival."
+  ],
+  "Gnome": [
+    "Size: Small",
+    "Speed: 30 ft.",
+    "Darkvision: You have Darkvision 60 ft.",
+    "Gnomish Cunning: You have advantage on INT, WIS, and CHA saving throws.",
+    "Gnomish Lineage: Choose one Gnome lineage."
+  ],
+  "Goliath": [
+    "Size: Medium",
+    "Speed: 35 ft.",
+    "Giant Ancestry: Choose one Giant ancestry.",
+    "Powerful Build: You have advantage on ability checks to end the Grappled condition. You also count as one size larger for carrying capacity."
+  ],
+  "Halfling": [
+    "Creature Type: Humanoid",
+    "Size: Small (about 2-3 feet tall)",
+    "Speed: 30 feet",
+    "Brave: You have Advantage on saving throws you make to avoid or end the Frightened condition.",
+    "Halfling Nimbleness: You can move through the space of any creature that is a size larger than you, but you can't stop in the same space.",
+    "Luck: When you roll a 1 on the d20 of a D20 Test, you can reroll the die, and you must use the new roll.",
+    "Naturally Stealthy: You can take the Hide action even when you are obscured only by a creature that is at least one size larger than you."
+  ],
+  "Human": [
+    "Size: Medium or Small",
+    "Speed: 30 ft.",
+    "Resourceful: Gain Heroic Inspiration whenever you finish a Long Rest.",
+    "Skillful: Gain proficiency in one skill.",
+    "Versatile: Gain one Origin feat."
+  ],
+  "Orc": [
+    "Size: Medium",
+    "Speed: 30 ft.",
+    "Adrenaline Rush: You can Dash as a bonus action. When you do, gain temporary HP equal to your Proficiency Bonus. Uses equal your Proficiency Bonus. Regain all uses on a Short or Long Rest.",
+    "Darkvision: You have Darkvision 120 ft.",
+    "Relentless Endurance: When reduced to 0 HP but not killed outright, drop to 1 HP instead. Use once per Long Rest."
+  ],
+  "Tiefling": [
+    "Size: Medium or Small",
+    "Speed: 30 ft.",
+    "Darkvision: You have Darkvision 60 ft.",
+    "Fiendish Legacy: Choose one Tiefling legacy.",
+    "Otherworldly Presence: You know the Thaumaturgy cantrip."
+  ]
+}

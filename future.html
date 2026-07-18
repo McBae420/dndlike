@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adventure - DnD Roguelike</title>
+    <link rel="stylesheet" href="styles.css?v=6" />
+    <link rel="stylesheet" href="future.css?v=3" />
+  </head>
+  <body>
+    <main class="future-app">
+      <header class="future-header">
+        <div>
+          <p class="eyebrow">Adventure</p>
+          <h1>Coming Soon</h1>
+        </div>
+        <nav class="nav-actions" aria-label="Page links">
+          <a href="dungeon-dm.html">DM VTT</a>
+          <a href="dungeon-player.html">Player VTT</a>
+          <a href="rewards.html">Rewards</a>
+          <a href="index.html">Character Builder</a>
+        </nav>
+      </header>
+
+      <section class="reward-roller" aria-labelledby="floor-reward-title">
+        <div class="roller-header">
+          <div>
+            <p class="eyebrow">Floor 1</p>
+            <h2 id="floor-reward-title">Level-Up Reward</h2>
+          </div>
+          <div class="reward-actions" aria-label="Reward actions">
+            <button class="reward-action" type="button" data-reward-action="elite">Elite Reward</button>
+            <button class="reward-action" type="button" data-reward-action="boss">Boss Reward</button>
+            <button class="reward-action" type="button" data-reward-action="final-boss">Final Boss Reward</button>
+            <button class="reward-action" type="button" data-reward-action="common">Common Reward</button>
+            <button class="reward-action" type="button" data-reward-action="feat">Feat</button>
+          </div>
+        </div>
+        <p id="reward-context" class="reward-context">Choose a reward type, then pick 1 of 3 options.</p>
+      </section>
+
+      <section class="saved-grid">
+        <article class="saved-panel" aria-labelledby="character-title">
+          <h2 id="character-title">Saved Character</h2>
+          <div id="saved-character" class="saved-character"></div>
+        </article>
+
+        <article class="saved-panel stats-panel" aria-labelledby="stats-title">
+          <h2 id="stats-title">Stats</h2>
+          <div id="stat-tracker" class="stat-tracker"></div>
+          <section class="inventory-panel" aria-labelledby="inventory-title">
+            <h3 id="inventory-title">Inventory</h3>
+            <div id="inventory-list" class="inventory-list"></div>
+          </section>
+        </article>
+
+        <article class="saved-panel" aria-labelledby="features-title">
+          <h2 id="features-title">Features</h2>
+          <div id="saved-rewards" class="feature-history"></div>
+        </article>
+      </section>
+    </main>
+
+    <section id="level-up-choice" class="choice-screen is-hidden">
+      <h1 id="level-up-choice-title">Choose your Levelup Feature</h1>
+      <div id="floor-one-rewards" class="card-grid subrace-grid" aria-live="polite"></div>
+      <button id="confirm-level-up" class="confirm-button" type="button" disabled>Confirm</button>
+    </section>
+
+    <script src="future.js?v=1"></script>
+  </body>
+</html>

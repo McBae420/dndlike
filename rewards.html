@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rewards - DnD Roguelike</title>
+    <link rel="stylesheet" href="rewards.css?v=1" />
+  </head>
+  <body>
+    <main class="reward-app">
+      <section class="reward-header">
+        <div>
+          <p class="eyebrow">Run Progression</p>
+          <h1>Rewards, Rarity, and Floor Logic</h1>
+        </div>
+        <div class="nav-actions">
+          <a class="nav-link" href="dungeon-dm.html">DM VTT</a>
+          <a class="nav-link" href="dungeon-player.html">Player VTT</a>
+          <a class="nav-link" href="future.html">Future Page</a>
+          <a class="nav-link" href="index.html">Character Builder</a>
+        </div>
+      </section>
+
+      <section class="control-panel" aria-label="Reward controls">
+        <label>
+          Floor
+          <select id="floor-select">
+            <option value="floor1">Floor 1</option>
+            <option value="floor2">Floor 2</option>
+            <option value="floor3">Floor 3</option>
+          </select>
+        </label>
+        <label>
+          Reward Type
+          <select id="reward-type-select">
+            <option value="normal">Dungeon Reward</option>
+            <option value="elite">Elite Reward</option>
+            <option value="boss">Boss Reward</option>
+            <option value="finalBoss">Final Boss Reward</option>
+          </select>
+        </label>
+        <label>
+          Class Pool
+          <select id="class-select">
+            <option value="Barbarian">Barbarian</option>
+            <option value="Bard">Bard</option>
+            <option value="Cleric">Cleric</option>
+            <option value="Druid">Druid</option>
+            <option value="Fighter">Fighter</option>
+            <option value="Monk">Monk</option>
+            <option value="Paladin">Paladin</option>
+            <option value="Ranger">Ranger</option>
+            <option value="Rogue">Rogue</option>
+            <option value="Sorcerer">Sorcerer</option>
+            <option value="Warlock">Warlock</option>
+            <option value="Wizard">Wizard</option>
+          </select>
+        </label>
+        <label>
+          View
+          <select id="view-select">
+            <option value="all">Browse All</option>
+            <option value="roll">Roll 3</option>
+          </select>
+        </label>
+        <label class="toggle-option">
+          <input id="class-only-toggle" type="checkbox" checked />
+          Class rewards only
+        </label>
+        <button id="roll-rewards" type="button">Roll Rewards</button>
+      </section>
+
+      <section class="reward-grid" id="reward-options" aria-live="polite"></section>
+
+      <section class="history-panel" aria-labelledby="reward-history-title">
+        <div class="history-header">
+          <div>
+            <p class="eyebrow">Saved Power</p>
+            <h2 id="reward-history-title">Previous Rewards</h2>
+          </div>
+          <button id="clear-history" type="button">Clear Rewards</button>
+        </div>
+        <div class="history-list" id="reward-history" aria-live="polite"></div>
+      </section>
+
+      <section class="logic-grid">
+        <article>
+          <h2>Core Rule</h2>
+          <p>Characters gain power through reward cards instead of normal class levels. A Level-Up Reward offers 3 random reward cards and the player chooses 1.</p>
+          <p>Reward category decides what kind of reward it is. Rarity decides how strong it is for the current floor.</p>
+        </article>
+
+        <article>
+          <h2>Floor Structure</h2>
+          <ol>
+            <li>Dungeon Section</li>
+            <li>Elite Dungeon</li>
+            <li>Short Rest</li>
+            <li>Dungeon Section</li>
+            <li>Random Event</li>
+            <li>Dungeon Section</li>
+            <li>Boss Fight</li>
+          </ol>
+        </article>
+
+        <article>
+          <h2>Boss Pool Logic</h2>
+          <p>Boss rewards use the reward pool of the floor the party is entering.</p>
+          <ul>
+            <li>Floor 1 Boss uses Floor 2 rewards.</li>
+            <li>Floor 2 Boss uses Floor 3 rewards.</li>
+            <li>Floor 3 Boss uses Final rewards.</li>
+          </ul>
+        </article>
+
+        <article>
+          <h2>Rarity Tables</h2>
+          <div class="table-list">
+            <p><strong>Dungeon:</strong> 55% Common, 30% Uncommon, 11% Rare, 3% Very Rare, 1% Legendary</p>
+            <p><strong>Elite:</strong> 30% Common, 42% Uncommon, 18% Rare, 7% Very Rare, 3% Legendary</p>
+            <p><strong>Boss:</strong> 40% Uncommon, 40% Rare, 14% Very Rare, 6% Legendary</p>
+            <p><strong>Final Boss:</strong> 50% Rare, 32% Very Rare, 18% Legendary</p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="rewards.js"></script>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player VTT - DnD Roguelike</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="dungeon.css?v=41" />
+  </head>
+  <body data-vtt-view="player">
+    <main class="dungeon-app">
+      <header class="dungeon-header">
+        <div>
+          <p class="eyebrow">Player VTT</p>
+          <h1>Party View</h1>
+        </div>
+        <nav class="nav-actions" aria-label="Page links">
+          <a href="dungeon-dm.html">DM View</a>
+          <a href="future.html">Adventure</a>
+          <a href="rewards.html">Rewards</a>
+          <a href="index.html">Character Builder</a>
+        </nav>
+      </header>
+
+      <section class="dungeon-layout">
+        <section class="map-panel" aria-label="Dungeon map area">
+          <div id="dungeon-grid" class="dungeon-grid" aria-label="Dungeon map"></div>
+          <div id="path-distance" class="path-distance is-hidden" aria-live="polite"></div>
+        </section>
+
+        <aside id="dungeon-sidebar" class="side-panel" aria-label="Dungeon details">
+          <section>
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">Actions</p>
+                <h2>Controls</h2>
+              </div>
+            </div>
+            <div class="dungeon-toolbar" aria-label="Dungeon controls">
+              <label>
+                Chapter
+                <select id="dungeon-stage">
+                  <option value="1">Dungeon 1 - Level 1</option>
+                  <option value="2">Dungeon 2 - Level 2</option>
+                  <option value="3">Dungeon 3 - Level 3</option>
+                  <option value="4">Dungeon 4 - Level 4</option>
+                  <option value="5">Final Boss Area - Level 5</option>
+                </select>
+              </label>
+              <label>
+                View
+                <select id="view-mode">
+                  <option value="dm">DM</option>
+                  <option value="player">Players</option>
+                </select>
+              </label>
+              <div class="toolbar-buttons">
+                <button id="generate-dungeon" type="button">Generate</button>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">Selected</p>
+                <h2>Inspector</h2>
+              </div>
+            </div>
+            <div id="inspector" class="inspector"></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=1"></script>
+    <script src="multiplayer.js?v=1"></script>
+    <script src="dungeon.js?v=52"></script>
+  </body>
+</html>

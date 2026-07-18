@@ -1,0 +1,98 @@
+{
+  "Barbarian": [
+    "Stats: +2 STR, +2 CON",
+    "HP: 12",
+    "Armor: Light, medium, shields",
+    "Weapons: Martial",
+    "Rage: Once per combat, enter a rage for 1 minute. While raging, gain +2 melee damage, advantage on STR checks and STR saves, and resistance to bludgeoning, piercing, and slashing damage.",
+    "Unarmored Defense: While you aren't wearing armor, your AC equals 10 + DEX mod + CON mod. You can use a shield and still gain this benefit."
+  ],
+  "Bard": [
+    "Stats: +2 CHA, +2 DEX",
+    "HP: 8",
+    "Armor: Light",
+    "Weapons: Simple",
+    "Bardic Inspiration: Your Inspiration die is a d6. As a bonus action, give one creature within 60 ft. one die. Within the next hour, when that creature fails a d20 test, it can roll the die and add it to the d20. Uses equal your CHA modifier, minimum once. Regain all uses on a Long Rest.",
+    "Spellcasting: You know 2 cantrips and 1 Bard spell. You have 2 max Mana."
+  ],
+  "Cleric": [
+    "Stats: +2 WIS, +2 CON",
+    "HP: 8",
+    "Armor: Light, medium, shields",
+    "Weapons: Simple",
+    "Spellcasting: You know 2 cantrips and 1 Cleric spell. You have 2 max Mana. Your spellcasting ability is Wisdom.",
+    "Divine Order: Choose one after selecting Cleric."
+  ],
+  "Druid": [
+    "Stats: +2 WIS, +2 CON",
+    "HP: 8",
+    "Armor: Light, shields",
+    "Weapons: Simple",
+    "Spellcasting: You know 2 cantrips and 1 Druid spell. You have 2 max Mana. Your spellcasting ability is Wisdom.",
+    "Primal Order: Choose one after selecting Druid."
+  ],
+  "Fighter": [
+    "Stats: +2 STR or DEX, +2 CON",
+    "HP: 10",
+    "Armor: All armor, shields",
+    "Weapons: Martial",
+    "Fighting Style: Gain 1 random Fighting Style feat. Defense is recommended if not rolling randomly.",
+    "Second Wind: As a bonus action, regain 1d10 HP. You can use this twice. Regain 1 use on a Short Rest and all uses on a Long Rest."
+  ],
+  "Monk": [
+    "Stats: +2 DEX, +2 WIS",
+    "HP: 8",
+    "Armor: None",
+    "Weapons: Simple",
+    "Martial Arts: Your Unarmed Strikes deal 1d6 damage. You can use DEX instead of STR for Unarmed Strike attack and damage rolls. You can make one Unarmed Strike as a bonus action.",
+    "Unarmored Defense: While you aren’t wearing armor or wielding a shield, your AC equals 10 + DEX mod + WIS mod."
+  ],
+  "Paladin": [
+    "Stats: +2 STR, +2 CHA",
+    "HP: 10",
+    "Armor: All armor, shields",
+    "Weapons: Martial",
+    "Lay on Hands: You have a pool of healing power with 5 HP. As a bonus action, touch a creature, including yourself, and spend points from the pool to restore that many HP.",
+    "Spellcasting: You know Smite and 1 random Paladin spell and have 2 max Mana. Your spellcasting ability is Charisma."
+  ],
+  "Ranger": [
+    "Stats: +2 DEX, +2 WIS",
+    "HP: 10",
+    "Armor: Light, medium, shields",
+    "Weapons: Martial",
+    "Favored Enemy: You always have Hunter’s Mark prepared. You can cast it twice without spending Mana. Regain all uses on a Long Rest.",
+    "Spellcasting: You know 1 random Ranger spell and have 2 max Mana. Your spellcasting ability is Wisdom."
+  ],
+  "Rogue": [
+    "Stats: +2 DEX, +2 CHA",
+    "HP: 8",
+    "Armor: Light",
+    "Weapons: Martial",
+    "Expertise: Gain Expertise in two of your skill proficiencies.",
+    "Sneak Attack: Once per turn, deal an extra 1d6 damage when you hit with a Finesse or ranged weapon and have advantage, or an ally is within 5 ft. of the target."
+  ],
+  "Sorcerer": [
+    "Stats: +2 CHA, +2 CON",
+    "HP: 6",
+    "Armor: None",
+    "Weapons: Simple",
+    "Spellcasting: You know 2 cantrips and 1 Sorcerer spell. You have 2 max Mana. Your spellcasting ability is Charisma.",
+    "Innate Sorcery: As a bonus action, unleash your magic for 1 minute. Your Sorcerer spell save DC increases by 1, and you have advantage on Sorcerer spell attack rolls. You can use this twice, regaining all uses on a Long Rest."
+  ],
+  "Warlock": [
+    "Stats: +2 CHA, +2 CON",
+    "HP: 8",
+    "Armor: Light",
+    "Weapons: Simple",
+    "Spellcasting: You know 2 cantrips and 1 Warlock spell. You have 1 max Mana. Your spellcasting ability is Charisma.",
+    "Eldritch Invocations: Gain 1 random Eldritch Pact Invocation."
+  ],
+  "Wizard": [
+    "Stats: +2 INT, +2 CON",
+    "HP: 6",
+    "Armor: None",
+    "Weapons: Simple",
+    "Spellcasting: You know 2 cantrips and 3 Wizard spells. You have 2 max Mana. Your spellcasting ability is Intelligence.",
+    "Arcane Recovery: When you finish a Short Rest, you can study your spellbook and regain expended Mana."
+  ]
+}

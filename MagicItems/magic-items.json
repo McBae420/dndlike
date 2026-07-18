@@ -1,0 +1,386 @@
+{
+  "common": [
+    {
+      "name": "Spell Scroll",
+      "rarity": "common",
+      "type": "Scroll",
+      "attunement": false,
+      "price": "Varies",
+      "url": "https://dnd2024.wikidot.com/magic-item:spell-scroll",
+      "description": "A scroll containing a single spell. When you choose this item, it lets you choose from 3 random level 2 spells from any class list.",
+      "spellScrollLevel": 2
+    },
+    {
+      "name": "Moon-Touched Sword",
+      "rarity": "common",
+      "type": "Weapon",
+      "attunement": false,
+      "price": "B+100 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:moon-touched-sword",
+      "description": "In Darkness, the unsheathed blade of this weapon sheds moonlight, creating Bright Light in a 15-foot radius and Dim Light for an additional 15 feet."
+    },
+    {
+      "name": "Clockwork Amulet",
+      "rarity": "common",
+      "type": "Wondrous Item",
+      "attunement": false,
+      "price": "100 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:clockwork-amulet",
+      "description": "This copper amulet contains tiny interlocking gears and is powered by magic from Mechanus, a plane of clockwork predictability. Faint ticking and whirring noises emanate from within.\n\nWhen you make an attack roll while wearing the amulet, you can forgo rolling the d20 to get a 10 on the die. Once used, this property can't be used again until the next dawn."
+    },
+    {
+      "name": "Silvered Weapon",
+      "rarity": "common",
+      "type": "Weapon",
+      "attunement": false,
+      "price": "B+100 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:silvered-weapon",
+      "description": "An alchemical process has bonded silver to this magic weapon. When you score a Critical Hit with it against a creature that is shape-shifted, the weapon deals one additional die of damage."
+    },
+    {
+      "name": "Walloping Ammunition",
+      "rarity": "common",
+      "type": "Weapon",
+      "attunement": false,
+      "price": "50 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:walloping-ammunition",
+      "description": "A creature hit by this ammunition must succeed on a DC 10 Strength saving throw or have the Prone condition."
+    },
+    {
+      "name": "Ruby of the War Mage",
+      "rarity": "common",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "100 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:ruby-of-the-war-mage",
+      "description": "Etched with eldritch runes, this 1-inch-diameter ruby allows you to use a Simple or Martial weapon as a Spellcasting Focus for your spells. For this property to work, you must attach the ruby to the weapon by pressing the ruby against it for at least 10 minutes. Thereafter, the ruby can't be removed unless you detach it as a Magic action, the weapon is destroyed, or your Attunement to the ruby ends."
+    },
+    {
+      "name": "Potion of Climbing",
+      "rarity": "common",
+      "type": "Potion",
+      "attunement": false,
+      "price": "50 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:potion-of-climbing",
+      "description": "When you drink this potion, you gain a Climb Speed equal to your Speed for 1 hour. During this time, you have Advantage on Strength (Athletics) checks to climb.\n\nThis potion is separated into brown, silver, and gray layers resembling bands of stone. Shaking the bottle fails to mix the colors."
+    },
+    {
+      "name": "Hat of Wizardry",
+      "rarity": "common",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "100 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:hat-of-wizardry",
+      "description": "This cone-shaped hat is adorned with moons and stars. While you are wearing it, you gain the following benefits.\n\nSpellcasting Focus. You can use the hat as a Spellcasting Focus for your Wizard spells.\n\nUnknown Spell. As a Magic action, you can try to cast a cantrip that you don't know. The cantrip must be on the Wizard spell list and have a casting time of an action, and you make a DC 10 Intelligence (Arcana) check. On a successful check, you cast the spell. On a failed check, the spell fails, and the action used to cast the spell is wasted. In either case, you can't use this property again until you finish a Long Rest.",
+      "requiredClasses": [
+        "Wizard"
+      ]
+    },
+    {
+      "name": "Dark Shard Amulet",
+      "rarity": "common",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "100 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:dark-shard-amulet",
+      "description": "This amulet is fashioned from a shard of resilient material originating from an otherworldly realm. While you are wearing it, you gain the following benefits.\n\nSpellcasting Focus. You can use the amulet as a Spellcasting Focus for your Warlock spells.\n\nUnknown Spell. As a Magic action, you can try to cast a cantrip that you don't know. The cantrip must be on the Warlock spell list and have a casting time of an action, and you make a DC 10 Intelligence (Arcana) check. On a successful check, you cast the spell. On a failed check, the spell fails, and the action used to cast it is wasted. In either case, you can't use this property again until you finish a Long Rest.",
+      "requiredClasses": [
+        "Warlock"
+      ]
+    }
+  ],
+  "uncommon": [
+    {
+      "name": "Weapon, +1",
+      "rarity": "uncommon",
+      "type": "Weapon",
+      "attunement": false,
+      "price": "B+400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:weapon-1-2-or-3",
+      "description": "You have a bonus to attack rolls and damage rolls made with this magic weapon. The bonus is determined by the weapon's rarity."
+    },
+    {
+      "name": "Shield, +1",
+      "rarity": "uncommon",
+      "type": "Armor",
+      "attunement": false,
+      "price": "B+400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:shield-1-2-or-3",
+      "description": "While holding this Shield, you have a bonus to Armor Class determined by the Shield's rarity, in addition to the Shield's normal bonus to AC."
+    },
+    {
+      "name": "Cloak of Protection",
+      "rarity": "uncommon",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:cloak-of-protection",
+      "description": "You gain a +1 bonus to Armor Class and saving throws while you wear this cloak."
+    },
+    {
+      "name": "Wand of Web",
+      "rarity": "uncommon",
+      "type": "Wand",
+      "attunement": true,
+      "price": "400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:wand-of-web",
+      "description": "This wand has 7 charges. While holding it, you can expend 1 charge to cast Web (save DC 13) from it.\n\nRegaining Charges. The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll 1d20. On a 1, the wand crumbles into ashes and is destroyed."
+    },
+    {
+      "name": "Pearl of Power",
+      "rarity": "uncommon",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:pearl-of-power",
+      "description": "While this pearl is on your person, you can take a Magic action to regain one expended spell slot of level 3 or lower. Once you use the pearl, it can't be used again until the next dawn."
+    },
+    {
+      "name": "Potion of Giant Strength",
+      "rarity": "uncommon",
+      "type": "Potion",
+      "attunement": false,
+      "price": "Varies",
+      "url": "https://dnd2024.wikidot.com/magic-item:potion-of-giant-strength",
+      "description": "When you drink this potion, your Strength score changes for 1 hour. The type of giant determines the score (see the table below). The potion has no effect on you if your Strength is equal to or greater than that score.\n\nThis potion's transparent liquid has floating in it a sliver of light resembling a giant's fingernail."
+    },
+    {
+      "name": "Wand of Magic Missiles",
+      "rarity": "uncommon",
+      "type": "Wand",
+      "attunement": false,
+      "price": "400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:wand-of-magic-missiles",
+      "description": "This wand has 7 charges. While holding it, you can expend no more than 3 charges to cast Magic Missile from it. For 1 charge, you cast the level 1 version of the spell. You can increase the spell's level by 1 for each additional charge you expend.\n\nRegaining Charges. The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll 1d20. On a 1, the wand crumbles into ashes and is destroyed."
+    },
+    {
+      "name": "Weapon of Warning",
+      "rarity": "uncommon",
+      "type": "Weapon",
+      "attunement": true,
+      "price": "B+400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:weapon-of-warning",
+      "description": "As long as this weapon is within your reach and you are attuned to it, you and allies within 30 feet of you gain the following benefits.\n\nAlarm. The weapon magically awakens each subject who is sleeping naturally when combat begins. This benefit doesn't wake a subject from magically induced sleep.\n\nSupernatural Readiness. Each subject has Advantage on its Initiative rolls."
+    },
+    {
+      "name": "Sentinel Shield",
+      "rarity": "uncommon",
+      "type": "Armor",
+      "attunement": false,
+      "price": "B+400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:sentinel-shield",
+      "description": "While holding this Shield, you have Advantage on Initiative rolls and Wisdom (Perception) checks. The Shield is emblazoned with a symbol of an eye."
+    },
+    {
+      "name": "Adamantine Armor",
+      "rarity": "uncommon",
+      "type": "Armor",
+      "attunement": false,
+      "price": "B+400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:adamantine-armor",
+      "description": "This suit of armor is reinforced with adamantine, one of the hardest substances in existence. While you're wearing it, any Critical Hit against you becomes a normal hit."
+    },
+    {
+      "name": "Winged Boots",
+      "rarity": "uncommon",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:winged-boots",
+      "description": "These boots have 4 charges and regain 1d4 expended charges daily at dawn. While wearing the boots, you can take a Magic action to expend 1 charge, gaining a Fly Speed of 30 feet for 1 hour. If you are flying when the duration expires, you descend at a rate of 30 feet per round until you land."
+    },
+    {
+      "name": "Gauntlets of Ogre Power",
+      "rarity": "uncommon",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:gauntlets-of-ogre-power",
+      "description": "Your Strength is 19 while you wear these gauntlets. They have no effect on you if your Strength is 19 or higher without them."
+    },
+    {
+      "name": "Bracers of Archery",
+      "rarity": "uncommon",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:bracers-of-archery",
+      "description": "While wearing these bracers, you have proficiency with the Longbow and Shortbow, and you gain a +2 bonus to damage rolls made with such weapons."
+    },
+    {
+      "name": "Javelin of Lightning",
+      "rarity": "uncommon",
+      "type": "Weapon",
+      "attunement": false,
+      "price": "B+400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:javelin-of-lightning",
+      "description": "Each time you make an attack roll with this magic weapon and hit, you can have it deal Lightning damage instead of Piercing damage.\n\nLightning Bolt. When you throw this weapon at a target no farther than 120 feet from you, you can forgo making a ranged attack roll and instead turn the weapon into a bolt of lightning. This bolt forms a 5-foot-wide Line between you and the target. The target and each other creature in the Line (excluding you) makes a DC 13 Dexterity saving throw, taking 4d6 Lightning damage on a failed save or half as much damage on a successful one. Immediately after dealing this damage, the weapon reappears in your hand. This property can't be used again until the next dawn."
+    },
+    {
+      "name": "Periapt of Wound Closure",
+      "rarity": "uncommon",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "400 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:periapt-of-wound-closure",
+      "description": "While wearing this pendant, you gain the following benefits.\n\nLife Preservation. Whenever you make a Death Saving Throw, you can change a roll of 9 or lower to a 10, turning a failed save into a successful one.\n\nNatural Healing Boost. Whenever you roll a Hit Point Die to regain Hit Points, double the number of Hit Points it restores."
+    },
+    {
+      "name": "Spell Scroll",
+      "rarity": "uncommon",
+      "type": "Scroll",
+      "attunement": false,
+      "price": "Varies",
+      "url": "https://dnd2024.wikidot.com/magic-item:spell-scroll",
+      "description": "A scroll containing a single spell. When you choose this item, it lets you choose from 3 random level 3 spells from any class list.",
+      "spellScrollLevel": 3
+    }
+  ],
+  "rare": [
+    {
+      "name": "Armor, +1",
+      "rarity": "rare",
+      "type": "Armor",
+      "attunement": false,
+      "price": "B+4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:armor-1-2-or-3",
+      "description": "You have a bonus to Armor Class while wearing this armor. The bonus is determined by its rarity."
+    },
+    {
+      "name": "Weapon, +2",
+      "rarity": "rare",
+      "type": "Weapon",
+      "attunement": false,
+      "price": "B+4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:weapon-1-2-or-3",
+      "description": "You have a bonus to attack rolls and damage rolls made with this magic weapon. The bonus is determined by the weapon's rarity."
+    },
+    {
+      "name": "Shield, +2",
+      "rarity": "rare",
+      "type": "Armor",
+      "attunement": false,
+      "price": "B+4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:shield-1-2-or-3",
+      "description": "While holding this Shield, you have a bonus to Armor Class determined by the Shield's rarity, in addition to the Shield's normal bonus to AC."
+    },
+    {
+      "name": "Ring of Spell Storing",
+      "rarity": "rare",
+      "type": "Ring",
+      "attunement": true,
+      "price": "4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:ring-of-spell-storing",
+      "description": "This ring stores spells cast into it, holding them until the attuned wearer uses them. The ring can store up to 5 levels worth of spells at a time. When found, it contains 1d6 - 1 levels of stored spells chosen by the DM.\n\nAny creature can cast a spell of level 1 through 5 into the ring by touching the ring as the spell is cast. The spell has no effect other than to be stored in the ring. If the ring can't hold the spell, the spell is expended without effect. The level of the slot used to cast the spell determines how much space it uses.\n\nWhile wearing this ring, you can cast any spell stored in it. The spell uses the slot level, spell save DC, spell attack bonus, and spellcasting ability of the original caster but is otherwise treated as if you cast the spell. The spell cast from the ring is no longer stored in it, freeing up space."
+    },
+    {
+      "name": "Cloak of Displacement",
+      "rarity": "rare",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:cloak-of-displacement",
+      "description": "While you wear this cloak, it magically projects an illusion that makes you appear to be standing in a place near your actual location, causing any creature to have Disadvantage on attack rolls against you. If you take damage, the property ceases to function until the start of your next turn. This property is suppressed while your Speed is 0."
+    },
+    {
+      "name": "Wand of Fireballs",
+      "rarity": "rare",
+      "type": "Wand",
+      "attunement": true,
+      "price": "4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:wand-of-fireballs",
+      "description": "This wand has 7 charges. While holding it, you can expend no more than 3 charges to cast Fireball (save DC 15) from it. For 1 charge, you cast the level 3 version of the spell. You can increase the spell's level by 1 for each additional charge you expend.\n\nRegaining Charges. The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll 1d20. On a 1, the wand crumbles into ashes and is destroyed."
+    },
+    {
+      "name": "Flame Tongue",
+      "rarity": "rare",
+      "type": "Weapon",
+      "attunement": true,
+      "price": "B+4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:flame-tongue",
+      "description": "While holding this magic weapon, you can take a Bonus Action and use a command word to cause flames to engulf the damage-dealing part of the weapon. These flames shed Bright Light in a 40-foot radius and Dim Light for an additional 40 feet. While the weapon is ablaze, it deals an extra 2d6 Fire damage on a hit. The flames last until you take a Bonus Action to issue the command again or until you drop, stow, or sheathe the weapon."
+    },
+    {
+      "name": "Belt of Giant Strength",
+      "rarity": "rare",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "Varies",
+      "url": "https://dnd2024.wikidot.com/magic-item:belt-of-giant-strength",
+      "description": "While wearing this belt, your Strength changes to a score granted by the belt. The type of giant determines the score (see the table below). The item has no effect on you if your Strength without the belt is equal to or greater than the belt's score."
+    },
+    {
+      "name": "Mantle of Spell Resistance",
+      "rarity": "rare",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:mantle-of-spell-resistance",
+      "description": "You have Advantage on saving throws against spells while you wear this cloak."
+    },
+    {
+      "name": "Ring of Protection",
+      "rarity": "rare",
+      "type": "Ring",
+      "attunement": true,
+      "price": "4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:ring-of-protection",
+      "description": "You gain a +1 bonus to Armor Class and saving throws while wearing this ring."
+    },
+    {
+      "name": "Cube of Force",
+      "rarity": "rare",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:cube-of-force",
+      "description": "This cube is about an inch across. Each face has a distinct marking on it. You can press one of those faces, expend the number of charges required for it, and thereby cast the spell associated with it (save DC 17), as shown in the Cube of Force Faces table.\n\nThe cube starts with 10 charges, and it regains 1d6 expended charges daily at dawn."
+    },
+    {
+      "name": "Boots of Speed",
+      "rarity": "rare",
+      "type": "Wondrous Item",
+      "attunement": true,
+      "price": "4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:boots-of-speed",
+      "description": "While you wear these boots, you can take a Bonus Action to click the boots' heels together. If you do, the boots double your Speed, and any creature that makes an Opportunity Attack against you has Disadvantage on the attack roll. If you click your heels together again, you end the effect.\n\nWhen you've used the boots' property for a total of 10 minutes, the magic ceases to function for you until you finish a Long Rest."
+    },
+    {
+      "name": "Sun Blade",
+      "rarity": "rare",
+      "type": "Weapon",
+      "attunement": true,
+      "price": "B+4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:sun-blade",
+      "description": "This item appears to be a sword hilt.\n\nBlade of Radiance. While grasping the hilt, you can take a Bonus Action to cause a blade of pure radiance to spring into existence or make the blade disappear. While the blade exists, this magic weapon functions as a Longsword with the Finesse property. If you are proficient with Longswords or Shortswords, you are proficient with the Sun Blade.\n\nYou gain a +2 bonus to attack rolls and damage rolls made with this weapon, which deals Radiant damage instead of Slashing damage. When you hit an Undead with it, that target takes an extra 1d8 Radiant damage.\n\nSunlight. The sword's luminous blade emits Bright Light in a 15-foot radius and Dim Light for an additional 15 feet. The light is sunlight. While the blade persists, you can take a Magic action to expand or reduce its radius of Bright Light and Dim Light by 5 feet each, to a maximum of 30 feet each or a minimum of 10 feet each."
+    },
+    {
+      "name": "Necklace of Fireballs",
+      "rarity": "rare",
+      "type": "Wondrous Item",
+      "attunement": false,
+      "price": "2,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:necklace-of-fireballs",
+      "description": "This necklace has 1d6 + 3 beads hanging from it. You can take a Magic action to detach a bead and throw it up to 60 feet away. When it reaches the end of its trajectory, the bead detonates as a level 3 Fireball (save DC 15).\n\nYou can hurl multiple beads, or even the whole necklace, at one time. When you do so, increase the damage of the Fireball by 1d6 for each bead after the first (maximum 12d6)."
+    },
+    {
+      "name": "Wand of Paralysis",
+      "rarity": "rare",
+      "type": "Wand",
+      "attunement": true,
+      "price": "4,000 GP",
+      "url": "https://dnd2024.wikidot.com/magic-item:wand-of-paralysis",
+      "description": "This wand has 7 charges. While holding it, you can take a Magic action to expend 1 charge to cause a thin blue ray to streak from the tip toward a creature you can see within 60 feet of yourself. The target must succeed on a DC 15 Constitution saving throw or have the Paralyzed condition for 1 minute. At the end of each of the target's turns, it repeats the save, ending the effect on itself on a success.\n\nRegaining Charges. The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll 1d20. On a 1, the wand crumbles into ashes and is destroyed."
+    },
+    {
+      "name": "Spell Scroll",
+      "rarity": "rare",
+      "type": "Scroll",
+      "attunement": false,
+      "price": "Varies",
+      "url": "https://dnd2024.wikidot.com/magic-item:spell-scroll",
+      "description": "A scroll containing a single spell. When you choose this item, it lets you choose from 3 random level 4 spells from any class list.",
+      "spellScrollLevel": 4
+    }
+  ]
+}
