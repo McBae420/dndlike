@@ -408,6 +408,7 @@ body {
   cursor: grab;
   overflow: visible;
   pointer-events: auto;
+  touch-action: none;
   will-change: transform;
   z-index: 2;
 }

@@ -25,7 +25,14 @@ protection for anonymous sign-ins.
    the code and a display name.
 4. Supabase assigns every player a separate authenticated identity and token.
 5. The DM stores the authoritative dungeon and validates player actions.
-6. Each player receives a filtered map and only their own private character row.
+6. Each player receives a separate fog-of-war map calculated from their own
+   token, character vision, and light effects.
+
+Players can move by dragging their own token or by tapping the token and then
+tapping the destination. The DM validates the path and movement allowance before
+the new position is broadcast. Normal vision is 30 feet; darkvision and active
+light sources can extend it. Explored tiles remain remembered, while creatures
+outside the player's current line of sight are hidden.
 
 Use a different browser profile or a private window when testing a second
 player. The app intentionally uses separate DM and player authentication storage

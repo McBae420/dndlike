@@ -132,10 +132,11 @@ const raceTokenImages = {
   Tiefling: "Races/Tokens/tiefling-token.png",
 };
 const monsterTokenImage = "Monsters/tokens/Golbin.png";
-const dungeonStorageKey = "avtizm4.dungeon";
 const playerVttStateKey = "avtizm4.vtt.player";
 let activePlayerTokenId = "player-1";
 const vttMode = document.body.dataset.vttView === "player" ? "player" : "dm";
+const legacyDungeonStorageKey = "avtizm4.dungeon";
+const dungeonStorageKey = `avtizm4.dungeon.${vttMode}`;
 const doorIcons = {
   door: "Icons/door.png",
   "locked door": "Icons/door.png",
@@ -172,6 +173,7 @@ let multiplayerSyncTimer = null;
 let multiplayerSyncInFlight = false;
 let multiplayerSyncQueued = false;
 let applyingMultiplayerState = false;
+let movementMessageTimer = null;
 
 const stageSelect = document.querySelector("#dungeon-stage");
 const viewModeSelect = document.querySelector("#view-mode");
@@ -215,9 +217,14 @@ function normalizeActivePlayerToken() {
 
 function loadDungeonState() {
   try {
-    const saved = JSON.parse(localStorage.getItem(dungeonStorageKey));
+    const storedDungeon = localStorage.getItem(dungeonStorageKey)
+      || (vttMode === "dm" ? localStorage.getItem(legacyDungeonStorageKey) : null);
+    const saved = JSON.parse(storedDungeon);
     if (!saved?.grid || !saved?.tokens) return false;
     dungeon = saved;
+    if (!localStorage.getItem(dungeonStorageKey)) {
+      localStorage.setItem(dungeonStorageKey, JSON.stringify(saved));
+    }
     normalizeActivePlayerToken();
     selectedTokenId = vttMode === "player"
       ? activePlayerTokenId
@@ -1484,7 +1491,7 @@ function renderTokenInTile(tileElement, token) {
   } else {
     dot.textContent = token.type === "player" ? "P" : "M";
   }
-  dot.addEventListener("mousedown", (event) => startTokenDrag(event, token));
+  dot.addEventListener("pointerdown", (event) => startTokenDrag(event, token));
   tileElement.append(dot);
 }
 
@@ -1718,27 +1725,49 @@ function characterDarkvisionFeet(character) {
   return ranges.length ? Math.max(...ranges) : 0;
 }
 
-function activeVisionEffect() {
-  const effect = loadJson(playerVttStateKey, {}).activeVisionEffect;
+function activeVisionEffect(playerState = null) {
+  const effect = playerState === null
+    ? loadJson(playerVttStateKey, {}).activeVisionEffect
+    : playerState?.activeVisionEffect;
   const feet = Number(effect?.feet);
   if (!effect?.source || !Number.isFinite(feet) || feet <= 0) return null;
   return { source: String(effect.source), feet };
 }
 
-function effectivePlayerVisionFeet(character = savedPlayerCharacter()) {
-  return Math.max(characterDarkvisionFeet(character), activeVisionEffect()?.feet || 0);
+function effectivePlayerVisionFeet(
+  character = savedPlayerCharacter(),
+  playerState = null,
+) {
+  return Math.max(
+    30,
+    characterDarkvisionFeet(character),
+    activeVisionEffect(playerState)?.feet || 0,
+  );
 }
 
-function playerSightRangeHexes() {
-  const visionFeet = effectivePlayerVisionFeet();
+function playerSightRangeHexes(character = savedPlayerCharacter(), playerState = null) {
+  const visionFeet = effectivePlayerVisionFeet(character, playerState);
   return visionFeet > 0 ? Math.max(1, Math.floor(visionFeet / 5)) : 1;
 }
 
-function computePlayerSightTiles() {
+function computePlayerSightTiles({
+  tokenIds = null,
+  character = savedPlayerCharacter(),
+  playerState = null,
+} = {}) {
   const visible = new Set();
   if (!dungeon) return visible;
-  const sightRange = playerSightRangeHexes();
-  const players = dungeon.tokens.filter((token) => token.type === "player" && token.currentHp > 0);
+  const sightRange = playerSightRangeHexes(character, playerState);
+  const requestedTokenIds = tokenIds
+    ? new Set(tokenIds)
+    : vttMode === "player" && activePlayerTokenId
+      ? new Set([activePlayerTokenId])
+      : null;
+  const players = dungeon.tokens.filter((token) =>
+    token.type === "player"
+    && token.currentHp > 0
+    && (!requestedTokenIds || requestedTokenIds.has(token.id)),
+  );
   for (const player of players) {
     const startTile = dungeon.grid[player.y]?.[player.x];
     if (!startTile || !isSightTraversableTile(startTile)) continue;
@@ -1825,19 +1854,48 @@ function isSightTraversableTile(tile) {
   return tile.type !== "void" && !isSightBlockingTile(tile);
 }
 
-function handleTileClick(x, y) {
+async function handleTileClick(x, y) {
   if (panState?.moved) return;
   if (tokenDragState?.moved) return;
   if (toggleDoorIfAllowed(x, y)) return;
-  setSelectedTile({ x, y });
+  const activeToken = activePlayerToken();
+  const activeTokenWasArmed = vttMode === "player"
+    && activeToken
+    && selectedTokenId === activeToken.id
+    && selectedTile?.x === activeToken.x
+    && selectedTile?.y === activeToken.y;
   const clickedToken = dungeon.tokens.find((token) => token.x === x && token.y === y && tokenVisible(token) && token.currentHp > 0);
   if (clickedToken) {
     selectedTokenId = clickedToken.id;
+    setSelectedTile({ x, y });
     refreshTokenTiles({ x: clickedToken.x, y: clickedToken.y });
     renderInspector();
     return;
   }
 
+  if (activeTokenWasArmed) {
+    const path = findMovementPath(activeToken, x, y);
+    if (path.length > 1) {
+      setSelectedTile({ x, y });
+      await submitOrAnimateMovement(activeToken, path);
+      renderInspector();
+      return;
+    }
+    const unrestrictedPath = findPath(
+      { x: activeToken.x, y: activeToken.y },
+      { x, y },
+      activeToken.id,
+    );
+    if (unrestrictedPath.length > playerMovementAllowance(activeToken) + 1) {
+      showMovementMessage(
+        `Too far — maximum ${playerMovementAllowance(activeToken) * 5} ft (${playerMovementAllowance(activeToken)} hexes)`,
+        true,
+      );
+      return;
+    }
+  }
+
+  setSelectedTile({ x, y });
   renderInspector();
 }
 
@@ -1931,6 +1989,7 @@ function startTokenDrag(event, token) {
   if (tokenMovementAnimating) return;
   event.preventDefault();
   event.stopPropagation();
+  event.currentTarget?.setPointerCapture?.(event.pointerId);
   selectedTokenId = token.id;
   selectedTile = { x: token.x, y: token.y };
   tokenDragState = {
@@ -1961,6 +2020,30 @@ function updateTokenDragPreview(x, y) {
   const path = findMovementPath(token, x, y);
   tokenDragState.moved = tokenDragState.moved || x !== tokenDragState.startX || y !== tokenDragState.startY;
   if (!path.length) {
+    const unrestrictedPath = findPath(
+      { x: token.x, y: token.y },
+      { x, y },
+      token.id,
+    );
+    const allowance = playerMovementAllowance(token);
+    if (
+      vttMode === "player"
+      && unrestrictedPath.length > allowance + 1
+    ) {
+      movementPreview = {
+        tokenId: token.id,
+        path: unrestrictedPath.slice(0, allowance + 1),
+        valid: false,
+        feet: allowance * 5,
+      };
+      invalidMoveTarget = { x, y };
+      updatePathDistance(
+        `Too far — maximum ${allowance * 5} ft (${allowance} hexes)`,
+        true,
+      );
+      applyDynamicTileClasses();
+      return;
+    }
     const preview = findPathTowardClosedDoor(token, x, y);
     movementPreview = {
       tokenId: token.id,
@@ -2033,7 +2116,8 @@ function gridPointFromEvent(event) {
 
 async function finishTokenDrag(event) {
   if (!tokenDragState) return;
-  updateTokenDragPreviewFromEvent(event);
+  const releasePoint = gridPointFromEvent(event);
+  if (releasePoint) updateTokenDragPreview(releasePoint.x, releasePoint.y);
   const token = dungeon.tokens.find((item) => item.id === tokenDragState.tokenId);
   const path = movementPreview?.valid ? movementPreview.path : [];
   const start = token ? { x: token.x, y: token.y } : null;
@@ -2051,17 +2135,27 @@ async function finishTokenDrag(event) {
   if (start) refreshTokenTiles(start);
 
   if (token && path.length > 1) {
-    const multiplayerState = window.avtizmMultiplayer?.getState();
-    if (vttMode === "player" && multiplayerState?.connected) {
-      await window.avtizmMultiplayer.submitAction("move-token", {
-        tokenId: token.id,
-        path: path.map((point) => ({ x: point.x, y: point.y })),
-      });
-    }
-    await animateTokenAlongPath(token, path);
-    saveDungeonState();
+    await submitOrAnimateMovement(token, path);
   }
   renderInspector();
+}
+
+async function submitOrAnimateMovement(token, path) {
+  const multiplayerState = window.avtizmMultiplayer?.getState();
+  if (vttMode === "player" && multiplayerState?.connected) {
+    const actionId = await window.avtizmMultiplayer.submitAction("move-token", {
+      tokenId: token.id,
+      path: path.map((point) => ({ x: point.x, y: point.y })),
+    });
+    showMovementMessage(
+      actionId ? "Move sent to the DM…" : "Could not send movement.",
+      !actionId,
+    );
+    return Boolean(actionId);
+  }
+  await animateTokenAlongPath(token, path);
+  saveDungeonState();
+  return true;
 }
 
 async function animateTokenAlongPath(token, path) {
@@ -2167,6 +2261,15 @@ function updatePathDistance(text, blocked) {
   pathDistanceElement.classList.toggle("is-blocked", blocked);
 }
 
+function showMovementMessage(text, blocked = false) {
+  if (movementMessageTimer) window.clearTimeout(movementMessageTimer);
+  updatePathDistance(text, blocked);
+  movementMessageTimer = window.setTimeout(() => {
+    movementMessageTimer = null;
+    if (!tokenDragState) updatePathDistance("", false);
+  }, blocked ? 4200 : 2200);
+}
+
 function startRightClickPan(event) {
   if (event.button !== 2) return;
   event.preventDefault();
@@ -2225,7 +2328,14 @@ function findMovementPath(token, x, y) {
   const tile = dungeon.grid[y]?.[x];
   if (!tile || !walkableTiles.has(tile.type)) return [];
   if (tokenAtOccupiesDestination(x, y, token)) return [];
-  return findPath({ x: token.x, y: token.y }, { x, y }, token.id);
+  const maxSteps = vttMode === "player"
+    ? playerMovementAllowance(token)
+    : Infinity;
+  return findPath({ x: token.x, y: token.y }, { x, y }, token.id, maxSteps);
+}
+
+function playerMovementAllowance(token) {
+  return Math.max(1, Number(token?.movement) || 6);
 }
 
 function findPathTowardClosedDoor(token, x, y) {
@@ -3214,16 +3324,36 @@ function scheduleMultiplayerDungeonSync() {
   }, 120);
 }
 
-function publicDungeonState() {
+function exploredTilesForMember(member, currentSightKeys) {
+  dungeon.playerExploredTiles ||= {};
+  const explored = new Set(
+    Array.isArray(dungeon.playerExploredTiles[member.user_id])
+      ? dungeon.playerExploredTiles[member.user_id]
+      : [],
+  );
+  currentSightKeys.forEach((key) => explored.add(key));
+  dungeon.playerExploredTiles[member.user_id] = [...explored];
+  return explored;
+}
+
+function roomIntersectsVisibleTiles(room, visibleKeys) {
+  for (let y = room.y; y < room.y + room.h; y += 1) {
+    for (let x = room.x; x < room.x + room.w; x += 1) {
+      if (visibleKeys.has(`${x},${y}`)) return true;
+    }
+  }
+  return false;
+}
+
+function publicDungeonState(member) {
   if (!dungeon) return null;
   const sanitized = JSON.parse(JSON.stringify(dungeon));
-  const visibleKeys = new Set();
-  dungeon.grid.forEach((row) => {
-    row.forEach((tile) => {
-      if (tile?.visibility === "revealed") visibleKeys.add(pointKey(tile));
-    });
+  const currentSightKeys = computePlayerSightTiles({
+    tokenIds: [member.token_id],
+    character: member.character || {},
+    playerState: member.player_state || {},
   });
-  computePlayerSightTiles().forEach((key) => visibleKeys.add(key));
+  const visibleKeys = exploredTilesForMember(member, currentSightKeys);
 
   const publicRewardIds = new Set(
     (dungeon.rewardPlacements || [])
@@ -3263,26 +3393,29 @@ function publicDungeonState() {
     return nextTile;
   }));
 
-  sanitized.rooms = (sanitized.rooms || []).filter((room) => room.revealed);
+  sanitized.rooms = (sanitized.rooms || []).filter((room) =>
+    roomIntersectsVisibleTiles(room, visibleKeys),
+  );
   sanitized.corridors = (sanitized.corridors || []).filter((corridor) =>
-    corridor.visibility === "revealed"
-    || corridor.tiles?.some((tile) => visibleKeys.has(pointKey(tile))),
+    corridor.tiles?.some((tile) => visibleKeys.has(pointKey(tile))),
   );
   sanitized.doors = (sanitized.doors || []).filter((door) => {
     const tile = sanitized.grid[door.y]?.[door.x];
     return tile && tile.type !== "void" && door.type !== "secret door";
   });
-  sanitized.traps = (sanitized.traps || []).filter((trap) => publicTrapIds.has(trap.id));
+  sanitized.traps = (sanitized.traps || []).filter((trap) =>
+    publicTrapIds.has(trap.id) && visibleKeys.has(pointKey(trap)),
+  );
   sanitized.rewardPlacements = (sanitized.rewardPlacements || []).filter(
-    (reward) => publicRewardIds.has(reward.id),
+    (reward) => publicRewardIds.has(reward.id) && visibleKeys.has(pointKey(reward)),
   );
 
   sanitized.tokens = (sanitized.tokens || []).filter((token) =>
-    token.type === "player"
+    token.id === member.token_id
     || (
-      token.visibleToPlayers
-      && visibleKeys.has(pointKey(token))
+      currentSightKeys.has(pointKey(token))
       && token.currentHp > 0
+      && (token.type === "player" || token.visibleToPlayers)
     ),
   );
   const publicMonsterIds = new Set(
@@ -3291,6 +3424,7 @@ function publicDungeonState() {
   sanitized.monsters = (sanitized.monsters || []).filter(
     (monster) => publicMonsterIds.has(monster.id),
   );
+  delete sanitized.playerExploredTiles;
   sanitized.isPlayerView = true;
   return sanitized;
 }
@@ -3306,12 +3440,11 @@ async function syncMultiplayerDungeon() {
 
   multiplayerSyncInFlight = true;
   try {
-    await multiplayer.saveDmState(dungeon);
-    const publicState = publicDungeonState();
     const views = multiplayerPlayerMembers().map((member) => ({
       userId: member.user_id,
-      dungeonState: publicState,
+      dungeonState: publicDungeonState(member),
     }));
+    await multiplayer.saveDmState(dungeon);
     await multiplayer.savePlayerViews(views);
   } finally {
     multiplayerSyncInFlight = false;
@@ -3357,12 +3490,14 @@ function validPlayerPath(token, path) {
     if (distance(previous, step) !== 1) return false;
     const tile = dungeon.grid[step.y]?.[step.x];
     if (!tile || !walkableTiles.has(tile.type)) return false;
+    const isDestination = index === path.length - 1;
     const occupied = dungeon.tokens.some(
       (other) =>
         other.id !== token.id
         && other.currentHp > 0
         && other.x === step.x
-        && other.y === step.y,
+        && other.y === step.y
+        && (isDestination || other.type !== token.type),
     );
     if (occupied) return false;
   }
@@ -3530,6 +3665,15 @@ window.addEventListener("avtizm-multiplayer:members-changed", () => {
 window.addEventListener("avtizm-multiplayer:game-action", (event) => {
   handleMultiplayerGameAction(event.detail.action);
 });
+window.addEventListener("avtizm-multiplayer:action-result", (event) => {
+  const action = event.detail.action;
+  if (vttMode !== "player" || action?.action_type !== "move-token") return;
+  if (action.status === "rejected") {
+    showMovementMessage(action.result?.reason || "The DM rejected that movement.", true);
+  } else if (action.status === "accepted") {
+    showMovementMessage("Movement accepted.", false);
+  }
+});
 
 applyPageMode();
 if (vttMode === "player") {
@@ -3543,9 +3687,10 @@ viewModeSelect?.addEventListener("change", render);
 gridElement.addEventListener("contextmenu", (event) => event.preventDefault());
 gridElement.addEventListener("mousedown", startRightClickPan);
 window.addEventListener("mousemove", moveRightClickPan);
-window.addEventListener("mousemove", updateTokenDragPreviewFromEvent);
+window.addEventListener("pointermove", updateTokenDragPreviewFromEvent);
 window.addEventListener("mouseup", endRightClickPan);
-window.addEventListener("mouseup", finishTokenDrag);
+window.addEventListener("pointerup", finishTokenDrag);
+window.addEventListener("pointercancel", cancelTokenDrag);
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape") cancelTokenDrag();
 });

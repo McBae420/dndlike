@@ -214,15 +214,15 @@
   }
 
   async function ensureUser() {
-    const { data: sessionData, error: sessionError } = await state.client.auth.getSession();
-    if (sessionError) throw sessionError;
-    let session = sessionData.session;
-    if (!session) {
+    const { data: userData, error: userError } = await state.client.auth.getUser();
+    let user = userError ? null : userData.user;
+    if (!user) {
+      await state.client.auth.signOut({ scope: "local" });
       const { data, error } = await state.client.auth.signInAnonymously();
       if (error) throw error;
-      session = data.session;
+      user = data.user;
     }
-    state.userId = session?.user?.id || null;
+    state.userId = user?.id || null;
     if (!state.userId) throw new Error("Could not create a multiplayer identity.");
   }
 
@@ -431,6 +431,19 @@
               state: payload.new.dungeon_state,
               revision: payload.new.revision,
             });
+          }
+        },
+      ).on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "player_actions",
+          filter: `user_id=eq.${state.userId}`,
+        },
+        (payload) => {
+          if (payload.new?.campaign_id === state.campaignId) {
+            emit("action-result", { action: payload.new });
           }
         },
       );
