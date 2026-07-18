@@ -24,6 +24,7 @@
   };
 
   let barElement = null;
+  let lastPlayerViewRevision = 0;
   let resolveReady;
   const ready = new Promise((resolve) => {
     resolveReady = resolve;
@@ -417,23 +418,38 @@
         (payload) => emit("game-action", { action: payload.new }),
       );
     } else {
-      state.channel.on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "player_views",
-          filter: `user_id=eq.${state.userId}`,
-        },
-        (payload) => {
-          if (payload.new?.campaign_id === state.campaignId) {
-            emit("dungeon-state", {
-              state: payload.new.dungeon_state,
-              revision: payload.new.revision,
-            });
-          }
-        },
-      );
+      state.channel
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "player_views",
+            filter: `user_id=eq.${state.userId}`,
+          },
+          (payload) => {
+            if (payload.new?.campaign_id === state.campaignId) {
+              emit("dungeon-state", {
+                state: payload.new.dungeon_state,
+                revision: payload.new.revision,
+              });
+            }
+          },
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "player_actions",
+            filter: `user_id=eq.${state.userId}`,
+          },
+          (payload) => {
+            if (payload.new?.campaign_id === state.campaignId) {
+              emit("action-complete", { action: payload.new });
+            }
+          },
+        );
     }
 
     state.channel.subscribe((status) => {
@@ -448,7 +464,7 @@
     });
   }
 
-  async function loadInitialState() {
+  async function loadInitialState(force = false) {
     if (mode === "dm") {
       const { data } = await state.client
         .from("campaign_dm_state")
@@ -459,6 +475,7 @@
         emit("dungeon-state", {
           state: data.dungeon_state,
           revision: data.revision,
+          force,
         });
       }
       const { data: pending } = await state.client
@@ -481,8 +498,14 @@
       emit("dungeon-state", {
         state: data.dungeon_state,
         revision: data.revision,
+        force,
       });
     }
+  }
+
+  async function refreshDungeonState() {
+    if (!state.connected || mode !== "player") return;
+    await loadInitialState(true);
   }
 
   async function disconnect() {
@@ -537,11 +560,13 @@
 
   async function savePlayerViews(views) {
     if (!state.connected || mode !== "dm" || !Array.isArray(views) || views.length === 0) return;
+    const revision = Math.max(Date.now(), lastPlayerViewRevision + 1);
+    lastPlayerViewRevision = revision;
     const rows = views.map((view) => ({
       campaign_id: state.campaignId,
       user_id: view.userId,
       dungeon_state: view.dungeonState,
-      revision: Date.now(),
+      revision,
       updated_at: new Date().toISOString(),
     }));
     const { error } = await state.client
@@ -603,6 +628,7 @@
     ready,
     getState,
     refreshMembers,
+    refreshDungeonState,
     syncCharacter,
     saveDmState,
     savePlayerViews,

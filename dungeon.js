@@ -173,7 +173,11 @@ let multiplayerSyncTimer = null;
 let multiplayerSyncInFlight = false;
 let multiplayerSyncQueued = false;
 let applyingMultiplayerState = false;
-let queuedPlayerDungeonState = null;
+let queuedPlayerDungeonUpdate = null;
+let lastAppliedMultiplayerRevision = 0;
+let pendingPlayerMove = null;
+let pendingPlayerMoveTimer = null;
+const playerMoveConfirmationTimeout = 8000;
 
 const stageSelect = document.querySelector("#dungeon-stage");
 const viewModeSelect = document.querySelector("#view-mode");
@@ -2114,12 +2118,21 @@ async function finishTokenDrag(event) {
 async function submitOrAnimateMovement(token, path) {
   const multiplayerState = window.avtizmMultiplayer?.getState();
   if (vttMode === "player" && multiplayerState?.connected) {
+    const pendingMove = beginPendingPlayerMove(token, path);
     const actionRequest = window.avtizmMultiplayer.submitAction("move-token", {
       tokenId: token.id,
       path: path.map((point) => ({ x: point.x, y: point.y })),
     }).catch(() => null);
     await animateTokenAlongPath(token, path);
-    return Boolean(await actionRequest);
+    const actionId = await actionRequest;
+    if (!actionId && pendingPlayerMove === pendingMove) {
+      clearPendingPlayerMove(pendingMove);
+      flushQueuedPlayerDungeonState();
+      window.avtizmMultiplayer.refreshDungeonState?.();
+      return false;
+    }
+    if (pendingPlayerMove === pendingMove) pendingMove.actionId = actionId;
+    return true;
   }
   await animateTokenAlongPath(token, path);
   saveDungeonState();
@@ -3423,11 +3436,68 @@ async function syncMultiplayerDungeon() {
   }
 }
 
-function applyMultiplayerDungeonState(nextState) {
+function multiplayerRevisionNumber(revision) {
+  const value = Number(revision);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function queuePlayerDungeonUpdate(nextState, revision, force = false) {
+  const nextRevision = multiplayerRevisionNumber(revision);
+  const queuedRevision = multiplayerRevisionNumber(queuedPlayerDungeonUpdate?.revision);
+  if (nextRevision && queuedRevision && nextRevision <= queuedRevision) return;
+  queuedPlayerDungeonUpdate = { state: nextState, revision: nextRevision, force };
+}
+
+function pendingMoveMatchesState(nextState) {
+  if (!pendingPlayerMove) return true;
+  const token = nextState.tokens.find((item) => item.id === pendingPlayerMove.tokenId);
+  return Boolean(
+    token
+    && token.x === pendingPlayerMove.x
+    && token.y === pendingPlayerMove.y
+  );
+}
+
+function beginPendingPlayerMove(token, path) {
+  if (pendingPlayerMoveTimer) window.clearTimeout(pendingPlayerMoveTimer);
+  const destination = path[path.length - 1];
+  const move = {
+    tokenId: token.id,
+    x: destination.x,
+    y: destination.y,
+    actionId: null,
+  };
+  pendingPlayerMove = move;
+  pendingPlayerMoveTimer = window.setTimeout(() => {
+    if (pendingPlayerMove !== move) return;
+    clearPendingPlayerMove(move);
+    flushQueuedPlayerDungeonState();
+    window.avtizmMultiplayer?.refreshDungeonState?.();
+  }, playerMoveConfirmationTimeout);
+  return move;
+}
+
+function clearPendingPlayerMove(move = pendingPlayerMove) {
+  if (!move || pendingPlayerMove !== move) return;
+  pendingPlayerMove = null;
+  if (pendingPlayerMoveTimer) window.clearTimeout(pendingPlayerMoveTimer);
+  pendingPlayerMoveTimer = null;
+}
+
+function applyMultiplayerDungeonState(nextState, revision = 0, force = false) {
   if (!nextState?.grid || !Array.isArray(nextState.tokens)) return;
-  if (vttMode === "player" && (tokenMovementAnimating || tokenDragState)) {
-    queuedPlayerDungeonState = nextState;
-    return;
+  const nextRevision = multiplayerRevisionNumber(revision);
+  if (!force && nextRevision && nextRevision <= lastAppliedMultiplayerRevision) return;
+  if (vttMode === "player") {
+    if (pendingPlayerMove && !pendingMoveMatchesState(nextState)) {
+      queuePlayerDungeonUpdate(nextState, nextRevision, force);
+      return;
+    }
+    if (pendingPlayerMove) clearPendingPlayerMove();
+    if (tokenMovementAnimating || tokenDragState) {
+      queuePlayerDungeonUpdate(nextState, nextRevision, force);
+      return;
+    }
   }
   const preservedPlayerSelection = vttMode === "player" && selectedTile
     ? { ...selectedTile }
@@ -3451,6 +3521,13 @@ function applyMultiplayerDungeonState(nextState) {
       gridElement.scrollLeft = preservedPlayerScroll.left;
       gridElement.scrollTop = preservedPlayerScroll.top;
     }
+    if (nextRevision) lastAppliedMultiplayerRevision = nextRevision;
+    if (
+      queuedPlayerDungeonUpdate
+      && multiplayerRevisionNumber(queuedPlayerDungeonUpdate.revision) <= lastAppliedMultiplayerRevision
+    ) {
+      queuedPlayerDungeonUpdate = null;
+    }
   } finally {
     applyingMultiplayerState = false;
   }
@@ -3461,13 +3538,13 @@ function flushQueuedPlayerDungeonState() {
     vttMode !== "player"
     || tokenMovementAnimating
     || tokenDragState
-    || !queuedPlayerDungeonState
+    || !queuedPlayerDungeonUpdate
   ) {
     return;
   }
-  const nextState = queuedPlayerDungeonState;
-  queuedPlayerDungeonState = null;
-  applyMultiplayerDungeonState(nextState);
+  const nextUpdate = queuedPlayerDungeonUpdate;
+  queuedPlayerDungeonUpdate = null;
+  applyMultiplayerDungeonState(nextUpdate.state, nextUpdate.revision, nextUpdate.force);
 }
 
 function actionMember(action) {
@@ -3639,11 +3716,38 @@ window.addEventListener("avtizm-multiplayer:connected", (event) => {
   handleMultiplayerConnected(event.detail);
 });
 window.addEventListener("avtizm-multiplayer:dungeon-state", (event) => {
-  applyMultiplayerDungeonState(event.detail.state);
+  applyMultiplayerDungeonState(
+    event.detail.state,
+    event.detail.revision,
+    event.detail.force,
+  );
   if (vttMode === "dm" && syncPartyTokensFromMembers()) {
     saveDungeonState();
     render();
   }
+});
+window.addEventListener("avtizm-multiplayer:action-complete", (event) => {
+  const action = event.detail.action;
+  if (
+    vttMode !== "player"
+    || action?.action_type !== "move-token"
+    || action.status !== "rejected"
+    || !pendingPlayerMove
+  ) return;
+  const destination = action.payload?.path?.at(-1);
+  if (
+    action.payload?.tokenId !== pendingPlayerMove.tokenId
+    || destination?.x !== pendingPlayerMove.x
+    || destination?.y !== pendingPlayerMove.y
+  ) return;
+  clearPendingPlayerMove();
+  flushQueuedPlayerDungeonState();
+  window.avtizmMultiplayer?.refreshDungeonState?.();
+});
+window.addEventListener("avtizm-multiplayer:disconnected", () => {
+  clearPendingPlayerMove();
+  queuedPlayerDungeonUpdate = null;
+  lastAppliedMultiplayerRevision = 0;
 });
 window.addEventListener("avtizm-multiplayer:members-changed", () => {
   const multiplayerState = window.avtizmMultiplayer?.getState();
