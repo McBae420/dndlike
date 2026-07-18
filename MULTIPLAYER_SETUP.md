@@ -29,10 +29,11 @@ protection for anonymous sign-ins.
    token, character vision, and light effects.
 
 Players move by dragging their own token. The DM validates the path and movement
-allowance before the new position is broadcast. Vision uses the character's
-vision stat, and an active torch can extend it to 40 feet. Explored tiles remain
-remembered, while creatures outside the player's current line of sight are
-hidden.
+allowance before the new position is broadcast, while the player sees a fast
+hex-by-hex movement animation. Vision uses the character's vision stat, and an
+active torch can extend it to 40 feet. Normal and locked doors do not block
+line-of-sight; walls and secret doors do. Explored tiles remain remembered,
+while creatures outside the player's current line of sight are hidden.
 
 Use a different browser profile or a private window when testing a second
 player. The app intentionally uses separate DM and player authentication storage

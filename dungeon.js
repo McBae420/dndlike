@@ -1845,7 +1845,7 @@ function gridLine(from, to) {
 }
 
 function isSightBlockingTile(tile) {
-  return ["wall", "door", "locked door", "secret door"].includes(tile.type);
+  return ["wall", "secret door"].includes(tile.type);
 }
 
 function isSightTraversableTile(tile) {
@@ -2115,14 +2115,16 @@ async function submitOrAnimateMovement(token, path) {
       tokenId: token.id,
       path: path.map((point) => ({ x: point.x, y: point.y })),
     });
-    return Boolean(actionId);
+    if (!actionId) return false;
+    await animateTokenAlongPath(token, path, 45);
+    return true;
   }
   await animateTokenAlongPath(token, path);
   saveDungeonState();
   return true;
 }
 
-async function animateTokenAlongPath(token, path) {
+async function animateTokenAlongPath(token, path, stepDuration = 95) {
   tokenMovementAnimating = true;
   token.isMoving = true;
   refreshTokenTiles({ x: token.x, y: token.y });
@@ -2131,7 +2133,7 @@ async function animateTokenAlongPath(token, path) {
     for (let index = 1; index < path.length; index += 1) {
       const step = path[index];
       const previous = { x: token.x, y: token.y };
-      await glideMovingToken(movingToken, previous, step, 95);
+      await glideMovingToken(movingToken, previous, step, stepDuration);
       token.x = step.x;
       token.y = step.y;
       const room = roomAt(step.x, step.y);
