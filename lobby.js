@@ -3,6 +3,9 @@
   const playerStatus = document.querySelector("#player-lobby-status");
   const roster = document.querySelector("#dm-roster");
   const rosterCount = document.querySelector("#roster-count");
+  const partyRewards = document.querySelector("#party-rewards");
+  const partyRewardButtons = document.querySelector("#party-reward-buttons");
+  const partyRewardStatus = document.querySelector("#party-reward-status");
   const characterStorageKey = "avtizm4.character";
   const characterCampaignStorageKey = "avtizm4.characterCampaign";
 
@@ -170,6 +173,7 @@
   function renderDmRoster(state, multiplayer = window.avtizmMultiplayer) {
     if (!roster || !rosterCount) return;
     const players = (state?.members || []).filter((member) => member.role === "player");
+    if (partyRewards) partyRewards.hidden = !state?.connected || players.length === 0;
     rosterCount.textContent = `${players.length} player${players.length === 1 ? "" : "s"}`;
     if (!state?.connected) {
       const empty = document.createElement("article");
@@ -195,6 +199,28 @@
     }
     roster.replaceChildren(...players.map((member) => rosterCard(member, state, multiplayer)));
   }
+
+  partyRewardButtons?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-reward-all]");
+    if (!button || button.disabled) return;
+    const multiplayer = window.avtizmMultiplayer;
+    const rewardType = button.dataset.rewardAll;
+    const label = button.textContent.replace(" to All", "");
+    const buttons = [...partyRewardButtons.querySelectorAll("button")];
+    buttons.forEach((item) => {
+      item.disabled = true;
+    });
+    if (partyRewardStatus) partyRewardStatus.textContent = `Sending ${label} to the party…`;
+    const result = await multiplayer?.grantRewardToAll(rewardType);
+    if (partyRewardStatus) {
+      partyRewardStatus.textContent = result?.total
+        ? `${label} sent to ${result.sent} of ${result.total} players.`
+        : "There are no players to reward.";
+    }
+    buttons.forEach((item) => {
+      item.disabled = false;
+    });
+  });
 
   function render(multiplayer = window.avtizmMultiplayer) {
     const state = multiplayer?.getState();

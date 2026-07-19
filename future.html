@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Character Sheet - DnD Roguelike</title>
-    <link rel="stylesheet" href="future-app.bundle.css?v=1" />
+    <link rel="stylesheet" href="future-app.bundle.css?v=2" />
   </head>
   <body data-vtt-view="player" data-multiplayer-scope="characters">
     <main class="future-app">
@@ -28,7 +28,7 @@
         </div>
       </section>
 
-      <section class="reward-roller" aria-labelledby="floor-reward-title">
+      <section id="player-reward-inbox" class="reward-roller" aria-labelledby="floor-reward-title" hidden>
         <div class="roller-header">
           <div>
             <p class="eyebrow">Rewards from your DM</p>
@@ -68,6 +68,6 @@
     </section>
 
     <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script defer src="future-app.bundle.js?v=2"></script>
+    <script defer src="future-app.bundle.js?v=3"></script>
   </body>
 </html>

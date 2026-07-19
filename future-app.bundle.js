@@ -697,6 +697,29 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
     return data;
   }
 
+  async function grantRewardToAll(rewardType) {
+    if (!state.connected || mode !== "dm" || !rewardType) {
+      return { sent: 0, total: 0 };
+    }
+    const playerIds = state.members
+      .filter((member) => member.role === "player")
+      .map((member) => member.user_id);
+    if (playerIds.length === 0) return { sent: 0, total: 0 };
+
+    const responses = await Promise.all(
+      playerIds.map((userId) => state.client.rpc("queue_campaign_reward", {
+        p_campaign_id: state.campaignId,
+        p_user_id: userId,
+        p_reward_type: rewardType,
+      })),
+    );
+    const sent = responses.filter((response) => !response.error).length;
+    const failed = responses.find((response) => response.error);
+    if (failed?.error) reportError("Could not send reward to every player", failed.error);
+    await refreshMembers();
+    return { sent, total: playerIds.length };
+  }
+
   async function consumeRewardGrant(grantId) {
     if (!state.connected || mode !== "player" || !grantId) return false;
     const { error } = await state.client.rpc("consume_campaign_reward", {
@@ -840,6 +863,7 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
     refreshTokenPositions,
     syncCharacter,
     grantReward,
+    grantRewardToAll,
     consumeRewardGrant,
     saveDmState,
     savePlayerViews,
@@ -1041,6 +1065,7 @@ const confirmLevelUpButton = document.querySelector("#confirm-level-up");
 const floorOneRewards = document.querySelector("#floor-one-rewards");
 const rewardContext = document.querySelector("#reward-context");
 const dmRewardGrants = document.querySelector("#dm-reward-grants");
+const playerRewardInbox = document.querySelector("#player-reward-inbox");
 
 let rewardPools = {};
 let originFeats = [];
@@ -1389,23 +1414,13 @@ function renderDmRewardGrants() {
     ? ownMember.player_state.pendingRewards
     : [];
 
-  if (!state?.connected) {
-    rewardContext.textContent = "Join a lobby to receive rewards from your DM.";
-    const empty = document.createElement("p");
-    empty.className = "dm-reward-empty";
-    empty.textContent = "No lobby connected.";
-    dmRewardGrants.replaceChildren(empty);
-    return;
-  }
-  if (grants.length === 0) {
-    rewardContext.textContent = "Your character is synchronized. Waiting for the DM to send a reward.";
-    const empty = document.createElement("p");
-    empty.className = "dm-reward-empty";
-    empty.textContent = "No unclaimed rewards.";
-    dmRewardGrants.replaceChildren(empty);
+  if (!state?.connected || grants.length === 0) {
+    if (playerRewardInbox) playerRewardInbox.hidden = true;
+    dmRewardGrants.replaceChildren();
     return;
   }
 
+  if (playerRewardInbox) playerRewardInbox.hidden = false;
   rewardContext.textContent = `${grants.length} reward${grants.length === 1 ? "" : "s"} waiting. Choose one to claim.`;
   dmRewardGrants.replaceChildren(...grants.map((grant) => {
     const card = document.createElement("article");

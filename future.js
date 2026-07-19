@@ -155,6 +155,7 @@ const confirmLevelUpButton = document.querySelector("#confirm-level-up");
 const floorOneRewards = document.querySelector("#floor-one-rewards");
 const rewardContext = document.querySelector("#reward-context");
 const dmRewardGrants = document.querySelector("#dm-reward-grants");
+const playerRewardInbox = document.querySelector("#player-reward-inbox");
 
 let rewardPools = {};
 let originFeats = [];
@@ -503,23 +504,13 @@ function renderDmRewardGrants() {
     ? ownMember.player_state.pendingRewards
     : [];
 
-  if (!state?.connected) {
-    rewardContext.textContent = "Join a lobby to receive rewards from your DM.";
-    const empty = document.createElement("p");
-    empty.className = "dm-reward-empty";
-    empty.textContent = "No lobby connected.";
-    dmRewardGrants.replaceChildren(empty);
-    return;
-  }
-  if (grants.length === 0) {
-    rewardContext.textContent = "Your character is synchronized. Waiting for the DM to send a reward.";
-    const empty = document.createElement("p");
-    empty.className = "dm-reward-empty";
-    empty.textContent = "No unclaimed rewards.";
-    dmRewardGrants.replaceChildren(empty);
+  if (!state?.connected || grants.length === 0) {
+    if (playerRewardInbox) playerRewardInbox.hidden = true;
+    dmRewardGrants.replaceChildren();
     return;
   }
 
+  if (playerRewardInbox) playerRewardInbox.hidden = false;
   rewardContext.textContent = `${grants.length} reward${grants.length === 1 ? "" : "s"} waiting. Choose one to claim.`;
   dmRewardGrants.replaceChildren(...grants.map((grant) => {
     const card = document.createElement("article");

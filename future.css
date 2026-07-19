@@ -92,6 +92,10 @@ p {
   padding: 18px;
 }
 
+.reward-roller[hidden] {
+  display: none;
+}
+
 .roller-header {
   display: flex;
   align-items: start;

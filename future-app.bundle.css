@@ -569,6 +569,39 @@ a {
   background: #2b2a25;
 }
 
+.party-rewards {
+  padding: 1.25rem 1.4rem;
+  display: grid;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--panel);
+}
+
+.party-rewards[hidden] {
+  display: none;
+}
+
+.party-rewards h2,
+.party-rewards p {
+  margin: 0;
+}
+
+.party-rewards > div:first-child > p:last-child {
+  margin-top: 0.35rem;
+  color: var(--muted);
+}
+
+.party-reward-buttons {
+  margin-top: 0;
+}
+
+.party-reward-status {
+  min-height: 1.2em;
+  color: var(--gold);
+  font-weight: 800;
+}
+
 .roster-note {
   margin: 0;
   color: var(--muted);
@@ -1637,6 +1670,10 @@ p {
   border: 1px solid rgba(241, 207, 123, 0.35);
   background: rgba(0, 0, 0, 0.24);
   padding: 18px;
+}
+
+.reward-roller[hidden] {
+  display: none;
 }
 
 .roller-header {

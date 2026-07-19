@@ -684,6 +684,29 @@
     return data;
   }
 
+  async function grantRewardToAll(rewardType) {
+    if (!state.connected || mode !== "dm" || !rewardType) {
+      return { sent: 0, total: 0 };
+    }
+    const playerIds = state.members
+      .filter((member) => member.role === "player")
+      .map((member) => member.user_id);
+    if (playerIds.length === 0) return { sent: 0, total: 0 };
+
+    const responses = await Promise.all(
+      playerIds.map((userId) => state.client.rpc("queue_campaign_reward", {
+        p_campaign_id: state.campaignId,
+        p_user_id: userId,
+        p_reward_type: rewardType,
+      })),
+    );
+    const sent = responses.filter((response) => !response.error).length;
+    const failed = responses.find((response) => response.error);
+    if (failed?.error) reportError("Could not send reward to every player", failed.error);
+    await refreshMembers();
+    return { sent, total: playerIds.length };
+  }
+
   async function consumeRewardGrant(grantId) {
     if (!state.connected || mode !== "player" || !grantId) return false;
     const { error } = await state.client.rpc("consume_campaign_reward", {
@@ -827,6 +850,7 @@
     refreshTokenPositions,
     syncCharacter,
     grantReward,
+    grantRewardToAll,
     consumeRewardGrant,
     saveDmState,
     savePlayerViews,

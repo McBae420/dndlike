@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DM Lobby - DnD Roguelike</title>
-    <link rel="stylesheet" href="lobby.css?v=1" />
+    <link rel="stylesheet" href="lobby.css?v=2" />
   </head>
   <body data-vtt-view="dm" data-lobby-view="dm" data-multiplayer-scope="characters">
     <main class="lobby-app">
@@ -37,6 +37,22 @@
         <div id="roster-count" class="roster-count">0 players</div>
       </section>
 
+      <section id="party-rewards" class="party-rewards" aria-labelledby="party-rewards-title" hidden>
+        <div>
+          <p class="eyebrow">Party rewards</p>
+          <h2 id="party-rewards-title">Reward Every Player</h2>
+          <p>Send the same reward to all current players.</p>
+        </div>
+        <div id="party-reward-buttons" class="reward-grant-buttons party-reward-buttons">
+          <button type="button" data-reward-all="level-up">Level-Up to All</button>
+          <button type="button" data-reward-all="common">Common to All</button>
+          <button type="button" data-reward-all="elite">Elite to All</button>
+          <button type="button" data-reward-all="boss">Boss to All</button>
+          <button type="button" data-reward-all="final-boss">Final Boss to All</button>
+        </div>
+        <p id="party-reward-status" class="party-reward-status" aria-live="polite"></p>
+      </section>
+
       <section id="dm-roster" class="dm-roster" aria-live="polite">
         <article class="empty-roster">
           <h2>Create a lobby to begin</h2>
@@ -46,6 +62,6 @@
     </main>
 
     <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script defer src="lobby-app.bundle.js?v=2"></script>
+    <script defer src="lobby-app.bundle.js?v=3"></script>
   </body>
 </html>

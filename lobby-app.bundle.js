@@ -697,6 +697,29 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
     return data;
   }
 
+  async function grantRewardToAll(rewardType) {
+    if (!state.connected || mode !== "dm" || !rewardType) {
+      return { sent: 0, total: 0 };
+    }
+    const playerIds = state.members
+      .filter((member) => member.role === "player")
+      .map((member) => member.user_id);
+    if (playerIds.length === 0) return { sent: 0, total: 0 };
+
+    const responses = await Promise.all(
+      playerIds.map((userId) => state.client.rpc("queue_campaign_reward", {
+        p_campaign_id: state.campaignId,
+        p_user_id: userId,
+        p_reward_type: rewardType,
+      })),
+    );
+    const sent = responses.filter((response) => !response.error).length;
+    const failed = responses.find((response) => response.error);
+    if (failed?.error) reportError("Could not send reward to every player", failed.error);
+    await refreshMembers();
+    return { sent, total: playerIds.length };
+  }
+
   async function consumeRewardGrant(grantId) {
     if (!state.connected || mode !== "player" || !grantId) return false;
     const { error } = await state.client.rpc("consume_campaign_reward", {
@@ -840,6 +863,7 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
     refreshTokenPositions,
     syncCharacter,
     grantReward,
+    grantRewardToAll,
     consumeRewardGrant,
     saveDmState,
     savePlayerViews,
@@ -889,6 +913,9 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
   const playerStatus = document.querySelector("#player-lobby-status");
   const roster = document.querySelector("#dm-roster");
   const rosterCount = document.querySelector("#roster-count");
+  const partyRewards = document.querySelector("#party-rewards");
+  const partyRewardButtons = document.querySelector("#party-reward-buttons");
+  const partyRewardStatus = document.querySelector("#party-reward-status");
   const characterStorageKey = "avtizm4.character";
   const characterCampaignStorageKey = "avtizm4.characterCampaign";
 
@@ -1056,6 +1083,7 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
   function renderDmRoster(state, multiplayer = window.avtizmMultiplayer) {
     if (!roster || !rosterCount) return;
     const players = (state?.members || []).filter((member) => member.role === "player");
+    if (partyRewards) partyRewards.hidden = !state?.connected || players.length === 0;
     rosterCount.textContent = `${players.length} player${players.length === 1 ? "" : "s"}`;
     if (!state?.connected) {
       const empty = document.createElement("article");
@@ -1081,6 +1109,28 @@ window.AVTIZM_SUPABASE_CONFIG = Object.freeze({
     }
     roster.replaceChildren(...players.map((member) => rosterCard(member, state, multiplayer)));
   }
+
+  partyRewardButtons?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-reward-all]");
+    if (!button || button.disabled) return;
+    const multiplayer = window.avtizmMultiplayer;
+    const rewardType = button.dataset.rewardAll;
+    const label = button.textContent.replace(" to All", "");
+    const buttons = [...partyRewardButtons.querySelectorAll("button")];
+    buttons.forEach((item) => {
+      item.disabled = true;
+    });
+    if (partyRewardStatus) partyRewardStatus.textContent = `Sending ${label} to the party…`;
+    const result = await multiplayer?.grantRewardToAll(rewardType);
+    if (partyRewardStatus) {
+      partyRewardStatus.textContent = result?.total
+        ? `${label} sent to ${result.sent} of ${result.total} players.`
+        : "There are no players to reward.";
+    }
+    buttons.forEach((item) => {
+      item.disabled = false;
+    });
+  });
 
   function render(multiplayer = window.avtizmMultiplayer) {
     const state = multiplayer?.getState();
